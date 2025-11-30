@@ -1,59 +1,54 @@
 package id.ac.pnm.food_recipe_app
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import id.ac.pnm.food_recipe_app.databinding.ActivityMainBinding
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var bottomNav: BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        enableEdgeToEdge()
-        setContentView(binding.root)
-        replaceFragment(Home_Fragment())
+        setContentView(R.layout.activity_main)
 
-        binding.bottomNavigationView.setOnItemSelectedListener {
+        bottomNav = findViewById(R.id.bottomNavigationView)
 
-            when(it.itemId){
-
-                R.id.Home -> replaceFragment(Home_Fragment())
-                R.id.Profile -> replaceFragment(Profile_Fragment())
-                R.id.Favorite -> replaceFragment(Fav_Fragment())
-
-                else ->{
-
-
-
-                }
-
-            }
-
-            true
-
+        if (savedInstanceState == null) {
+            loadFragment(Home_Fragment())
         }
 
+        setupBottomNavigation()
+    }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+    private fun setupBottomNavigation() {
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+
+                R.id.Home -> {
+                    loadFragment(Home_Fragment())
+                    true
+                }
+
+                R.id.Favorite -> {
+                    loadFragment(FavoritFragment())
+                    true
+                }
+
+                R.id.Profile -> {
+                    loadFragment(Profile_Fragment())
+                    true
+                }
+
+                else -> false
+            }
         }
     }
 
-    private fun replaceFragment(fragment: Fragment){
-
-        val framentManager = supportFragmentManager
-        val fragmentTransaction = framentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.Frame_Layout,fragment)
-        fragmentTransaction.commit()
-
-
+    private fun loadFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.Frame_Layout, fragment)
+            .commit()
     }
 }

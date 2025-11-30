@@ -1,55 +1,93 @@
 package id.ac.pnm.food_recipe_app
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+import android.widget.EditText
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
-/**
- * A simple [Fragment] subclass.
- * Use the [Home_Fragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class Home_Fragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var recyclerFood: RecyclerView
+    private lateinit var adapter: FoodAdapter
+    private lateinit var searchField: EditText
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
+    // DATA ASLI (baru ditambah utk search)
+    private var originalFoodList = FoodDataSource.getAllFoods()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_home_, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Home_Fragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic fun newInstance(param1: String, param2: String) =
-                Home_Fragment().apply {
-                    arguments = Bundle().apply {
-                        putString(ARG_PARAM1, param1)
-                        putString(ARG_PARAM2, param2)
-                    }
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        recyclerFood = view.findViewById(R.id.recyclerFood)
+        searchField = view.findViewById(R.id.editSearch)
+
+        recyclerFood.layoutManager = LinearLayoutManager(requireContext())
+
+        setupAdapter()
+        setupSearchBar()   // 🔥 BARU: aktifkan fitur search
+    }
+
+    private fun setupAdapter() {
+        adapter = FoodAdapter(
+            foodList = originalFoodList,
+            onItemClick = { food ->
+                val intent = Intent(requireContext(), Detail_Resep::class.java)
+                intent.putExtra("FOOD_DATA", food)
+                startActivity(intent)
+            },
+            onFavoriteClick = { food ->
+                FoodDataSource.toggleFavorite(food.id)
+
+                // Update adapter
+                adapter.updateData(FoodDataSource.getAllFoods())
+
+                // update data asli supaya search tetap valid
+                originalFoodList = FoodDataSource.getAllFoods()
+            }
+        )
+
+        recyclerFood.adapter = adapter
+    }
+
+    // 🔍 BARU: Fungsi search
+    private fun setupSearchBar() {
+        searchField.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterList(s.toString())
+            }
+        })
+    }
+
+    // 🔍 BARU: Filter data
+    private fun filterList(query: String) {
+        val filtered = originalFoodList.filter { food ->
+            food.title.contains(query, ignoreCase = true)
+                    || food.desc.contains(query, ignoreCase = true)
+        }
+
+        adapter.updateData(filtered)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        adapter.updateData(FoodDataSource.getAllFoods())
+        originalFoodList = FoodDataSource.getAllFoods() // BARU: update untuk search
     }
 }

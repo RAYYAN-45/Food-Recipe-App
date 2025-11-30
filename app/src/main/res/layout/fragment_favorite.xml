@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8EDDD">
+
+    <!-- Icon Back (Kiri Atas) -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/back"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:padding="8dp"
+        android:tint="#8B4513"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp" />
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/txtFavoriteTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RESEP TERSIMPAN"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#8B4513"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
+
+    <!-- RecyclerView Favorit (ID diperbaiki) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerFavorite"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/txtFavoriteTitle"
+        android:layout_marginTop="20dp"
+        android:clipToPadding="false"
+        android:paddingBottom="10dp" />
+
+    <!-- Empty State -->
+    <TextView
+        android:id="@+id/txtEmptyFavorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Belum ada resep favorit.\nKlik ikon ⭐ untuk menyimpan resep!"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:textAlignment="center"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>
