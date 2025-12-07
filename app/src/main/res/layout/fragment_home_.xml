@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F6ECDC"
+    android:background="#fcf2e4"
     android:padding="16dp">
 
     <!-- LOGO -->
@@ -29,9 +29,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Search"
             android:background="@android:color/transparent"
-            android:textSize="16sp"/>
+            android:hint="Search"
+            android:minHeight="48dp"
+            android:textSize="16sp" />
 
         <ImageView
             android:layout_width="28dp"

@@ -9,7 +9,7 @@
     card:cardCornerRadius="20dp"
     card:cardUseCompatPadding="true"
     card:cardElevation="2dp"
-    card:cardBackgroundColor="#F8EDDD">
+    card:cardBackgroundColor="#fcf2e4">
 
     <RelativeLayout
         android:layout_width="match_parent"
