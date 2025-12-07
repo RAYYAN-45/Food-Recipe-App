@@ -34,15 +34,13 @@ class FavoritFragment : Fragment() {
 
         // Tombol Back → kembali ke Home + update BottomNav
         btnBack.setOnClickListener {
-            // Ganti fragment ke Home
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.Frame_Layout, Home_Fragment())
                 .commit()
 
-            // Update Bottom Navigation agar pindah ke Home
             val bottomNav = requireActivity()
                 .findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-            bottomNav.selectedItemId = R.id.Home   // <-- PENTING
+            bottomNav.selectedItemId = R.id.Home
         }
 
         setupAdapter()
@@ -52,8 +50,8 @@ class FavoritFragment : Fragment() {
         adapter = FoodAdapter(
             foodList = FoodDataSource.getFavoriteFoods(),
             onItemClick = { food ->
+                // Klik Card → buka Detail_Resep
                 val intent = Intent(requireContext(), Detail_Resep::class.java)
-                intent.putExtra("FOOD_DATA", food)
                 startActivity(intent)
             },
             onFavoriteClick = { food ->

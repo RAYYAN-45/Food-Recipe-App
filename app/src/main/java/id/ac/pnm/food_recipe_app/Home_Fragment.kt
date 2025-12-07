@@ -18,8 +18,7 @@ class Home_Fragment : Fragment() {
     private lateinit var adapter: FoodAdapter
     private lateinit var searchField: EditText
 
-    // DATA ASLI (baru ditambah utk search)
-    private var originalFoodList = FoodDataSource.getAllFoods()
+    private var originalFoodList = FoodDataSource.getAllFoods() // untuk search
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,24 +37,20 @@ class Home_Fragment : Fragment() {
         recyclerFood.layoutManager = LinearLayoutManager(requireContext())
 
         setupAdapter()
-        setupSearchBar()   // 🔥 BARU: aktifkan fitur search
+        setupSearchBar()
     }
 
     private fun setupAdapter() {
         adapter = FoodAdapter(
             foodList = originalFoodList,
             onItemClick = { food ->
+                // Klik Card → buka Detail_Resep
                 val intent = Intent(requireContext(), Detail_Resep::class.java)
-                intent.putExtra("FOOD_DATA", food)
                 startActivity(intent)
             },
             onFavoriteClick = { food ->
                 FoodDataSource.toggleFavorite(food.id)
-
-                // Update adapter
                 adapter.updateData(FoodDataSource.getAllFoods())
-
-                // update data asli supaya search tetap valid
                 originalFoodList = FoodDataSource.getAllFoods()
             }
         )
@@ -63,31 +58,27 @@ class Home_Fragment : Fragment() {
         recyclerFood.adapter = adapter
     }
 
-    // 🔍 BARU: Fungsi search
     private fun setupSearchBar() {
         searchField.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun afterTextChanged(s: Editable?) {}
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 filterList(s.toString())
             }
         })
     }
 
-    // 🔍 BARU: Filter data
     private fun filterList(query: String) {
         val filtered = originalFoodList.filter { food ->
-            food.title.contains(query, ignoreCase = true)
-                    || food.desc.contains(query, ignoreCase = true)
+            food.title.contains(query, ignoreCase = true) ||
+                    food.desc.contains(query, ignoreCase = true)
         }
-
         adapter.updateData(filtered)
     }
 
     override fun onResume() {
         super.onResume()
         adapter.updateData(FoodDataSource.getAllFoods())
-        originalFoodList = FoodDataSource.getAllFoods() // BARU: update untuk search
+        originalFoodList = FoodDataSource.getAllFoods()
     }
 }
