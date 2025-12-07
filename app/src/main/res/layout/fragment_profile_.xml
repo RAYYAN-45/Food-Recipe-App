@@ -7,12 +7,13 @@
     tools:context=".Profile_Fragment">
 
     <TextView
+        android:id="@+id/TextViewUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Selamat Datang"
-        android:textSize="30dp"
+        android:layout_gravity="center"
         android:layout_marginBottom="90dp"
-        android:layout_gravity="center"/>
+        android:text="Hai, User"
+        android:textSize="30dp" />
 
     <ImageView
         android:id="@+id/GambarProfil"
@@ -23,12 +24,13 @@
         android:layout_marginLeft="110dp"
         android:src="@drawable/desaintanpa" />
 
-    <TextView
-        android:id="@+id/LogOut"
+    <Button
+        android:id="@+id/BtnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Log out"
-        android:textSize="20dp"
+        android:layout_gravity="center"
         android:layout_marginTop="200dp"
-        android:layout_gravity="center"/>
+        android:backgroundTint="#c27851"
+        android:text="Log out"
+        android:textSize="20dp" />
 </FrameLayout>
