@@ -1,90 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#fcf2e4"
-    android:padding="16dp"
-    android:fillViewport="true">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:background="#fcf2e4"
+        android:padding="16dp"
+        android:fillViewport="true">
 
-        <!-- FOTO/HEADER -->
-        <ImageView
-            android:id="@+id/imgHeader"
+
+        <LinearLayout
+            android:id="@+id/layoutContent"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/souvlaki" />
+            android:layout_height="wrap_content">
 
-        <!-- CARD UTAMA -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:contentPadding="16dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="16dp">
-
-            <LinearLayout
-                android:orientation="vertical"
+            <!-- FOTO/HEADER -->
+            <ImageView
+                android:id="@+id/imgHeader"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/souvlaki" />
 
-                <!-- JUDUL UTAMA -->
-                <TextView
-                    android:id="@+id/txtJudul"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="BOEUF BOURGUIGNON"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="#5a3e3e"
-                    android:paddingBottom="12dp" />
+            <!-- CARD UTAMA -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:contentPadding="16dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp">
 
-                <!-- SUB JUDUL 1 -->
-                <TextView
-                    android:id="@+id/txtSubJudulBahan"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Daftar Bahan"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:paddingTop="8dp"
-                    android:paddingBottom="8dp"/>
-
-                <!-- RECYCLERVIEW UNTUK DETAIL BAHAN -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvBahan"
+                <LinearLayout
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"/>
+                    android:layout_height="wrap_content">
 
-                <!-- SUB JUDUL 2 -->
-                <TextView
-                    android:id="@+id/txtSubJudulLangkah"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Langkah - Langkah"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:paddingTop="16dp"
-                    android:paddingBottom="8dp"/>
+                    <!-- JUDUL UTAMA -->
+                    <TextView
+                        android:id="@+id/txtJudul"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BOEUF BOURGUIGNON"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="#5a3e3e"
+                        android:paddingBottom="12dp" />
 
-                <!-- RECYCLERVIEW UNTUK LANGKAH -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvLangkah"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"/>
+                    <!-- SUB JUDUL 1 -->
+                    <TextView
+                        android:id="@+id/txtSubJudulBahan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Daftar Bahan"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp"/>
 
-            </LinearLayout>
+                    <!-- RECYCLERVIEW UNTUK DETAIL BAHAN -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvBahan"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
 
-        </com.google.android.material.card.MaterialCardView>
+                    <!-- SUB JUDUL 2 -->
+                    <TextView
+                        android:id="@+id/txtSubJudulLangkah"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Langkah - Langkah"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="8dp"/>
 
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+                    <!-- RECYCLERVIEW UNTUK LANGKAH -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvLangkah"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="24dp"
+        android:src="@drawable/arrow"
+        android:scaleType="center"
+        android:padding="10dp"
+        android:background="@drawable/bg_button"
+        android:elevation="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="Back">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/btnShare"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="24dp"
+        android:background="@drawable/bg_button"
+        android:contentDescription="Back"
+        android:elevation="6dp"
+        android:padding="10dp"
+        android:scaleType="center"
+        android:src="@drawable/share"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/btnFavorite"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="24dp"
+        android:background="@drawable/bg_button"
+        android:contentDescription="Back"
+        android:elevation="6dp"
+        android:padding="10dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_star_border"
+        app:layout_constraintEnd_toStartOf="@+id/btnShare"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
