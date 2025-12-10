@@ -52,6 +52,7 @@ class FavoritFragment : Fragment() {
             onItemClick = { food ->
                 // Klik Card → buka Detail_Resep
                 val intent = Intent(requireContext(), Detail_Resep::class.java)
+                intent.putExtra("Extra_Food", food)
                 startActivity(intent)
             },
             onFavoriteClick = { food ->
