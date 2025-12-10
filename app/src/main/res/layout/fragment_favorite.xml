@@ -29,7 +29,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp" />
 
-    <!-- RecyclerView Favorit (ID diperbaiki) -->
+    <!-- RecyclerView Favorit (list faforit dlm bentuk card  -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerFavorite"
         android:layout_width="match_parent"
@@ -50,5 +50,5 @@
         android:textAlignment="center"
         android:layout_centerInParent="true"
         android:visibility="gone" />
-
+//baru ditampilkan ketika data kosong
 </RelativeLayout>

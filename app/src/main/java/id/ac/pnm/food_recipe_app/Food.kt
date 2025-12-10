@@ -9,4 +9,4 @@ data class Food(
     val image: Int,
     val ingredients: List<String>,
     val steps: List<String>
-) : Serializable
+) : Serializable//byte agar dapat dikirim antar Activity/Fragment.
