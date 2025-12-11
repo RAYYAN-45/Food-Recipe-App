@@ -33,7 +33,7 @@ class FoodAdapter(
         // ambil data sesuai posisi
         val food = foodList[position]
 
-        holder.txtTitle.text = food.title
+        holder.txtTitle.text = food.title //menampilkan text
         holder.txtDesc.text = food.desc
         holder.imgFood.setImageResource(food.image)
 

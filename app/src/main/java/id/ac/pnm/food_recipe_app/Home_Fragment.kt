@@ -24,8 +24,8 @@ class Home_Fragment : Fragment() {
 
     override fun onCreateView( //mengubah file XML menjadi tampilan nyata (View)
         inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        container: ViewGroup?, //tempat fragment akan diletakkan
+        savedInstanceState: Bundle? //data lama kalau fragment hidup kembali
     ): View? {
         // menghubungkan fragment dengan file XML fragment_home_
         return inflater.inflate(R.layout.fragment_home_, container, false)

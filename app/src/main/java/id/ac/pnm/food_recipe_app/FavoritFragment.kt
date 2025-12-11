@@ -72,7 +72,7 @@ class FavoritFragment : Fragment() {
             }
         )
 
-        recyclerFavorite.adapter = adapter
+        recyclerFavorite.adapter = adapter //isi daftar makanan ini memakai data dari adapte
     }
     // data favorit di-refresh
     override fun onResume() {
