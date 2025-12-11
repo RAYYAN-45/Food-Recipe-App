@@ -18,6 +18,7 @@ class TextAdapter(private val list: List<String>) :
         return TextViewHolder(view)
     }
 
+    //untuk urutan list
     override fun onBindViewHolder(holder: TextViewHolder, position: Int) {
         holder.txtItem.text = list[position]
     }

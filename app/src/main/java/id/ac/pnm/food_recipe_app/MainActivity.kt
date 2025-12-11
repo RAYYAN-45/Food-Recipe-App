@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 
         bottomNav = findViewById(R.id.bottomNavigationView)
 
+        //buat home fragment jadi default
         if (savedInstanceState == null) {
             loadFragment(Home_Fragment().apply {
                 arguments = Bundle().apply {
@@ -32,17 +33,17 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNavigation() {
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-
+                //kondisi ketika home fragment
                 R.id.Home -> {
                     loadFragment(Home_Fragment())
                     true
                 }
-
+                //kondisi ketika fevorite fragment
                 R.id.Favorite -> {
                     loadFragment(FavoritFragment())
                     true
                 }
-
+                //kondisi ketika profile fragment
                 R.id.Profile -> {
                     loadFragment(Profile_Fragment())
                     true
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    //fungsi pinfaah fragment
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.Frame_Layout, fragment)

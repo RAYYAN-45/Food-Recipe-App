@@ -29,6 +29,7 @@ class LoginActivity : AppCompatActivity() {
             val email = editTextTextEmailAddress.text.toString()
             val intentLoginToMain = Intent(this, MainActivity::class.java)
 
+            //mengambil username
             intentLoginToMain.putExtra("Username", email)
             Toast.makeText(this, "Login Berhasl", Toast.LENGTH_LONG).show()
             startActivity(intentLoginToMain)

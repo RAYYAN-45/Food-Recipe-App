@@ -46,15 +46,17 @@ class Profile_Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //mengambil username dari MainActivity
         val username = activity?.intent?.getStringExtra("Username")
         val TextViewUsername = view.findViewById<TextView>(R.id.TextViewUsername)
         TextViewUsername.text ="Hai, $username"
 
+        //button logout
         val btnLogout = view.findViewById<Button>(R.id.BtnLogout)
         btnLogout.setOnClickListener{
             val intent = Intent(requireActivity(), LoginActivity::class.java)
             startActivity(intent)
-
+            //setelah diklik tidak bisa kembali ke halaman profile
             requireActivity().finish()
         }
     }
