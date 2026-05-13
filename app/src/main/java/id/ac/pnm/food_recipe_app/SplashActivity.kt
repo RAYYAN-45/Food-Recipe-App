@@ -21,11 +21,14 @@ class SplashActivity : AppCompatActivity() {
 
         }
 
+        //membuat delay splash screen
         Handler(Looper.getMainLooper()).postDelayed({
             goToLoginActivity()
             }, 3000L)
     }
 
+
+    //fungsi menuju LoginActivity setelah splashscreen
     private fun goToLoginActivity(){
         val intent = Intent(this@SplashActivity, LoginActivity::class.java)
         startActivity(intent)
