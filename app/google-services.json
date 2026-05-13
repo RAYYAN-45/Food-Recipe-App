@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "488777845707",
+    "firebase_url": "https://unscramble-ffc25-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "unscramble-ffc25",
+    "storage_bucket": "unscramble-ffc25.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488777845707:android:1d65ae515cafe068e4044e",
+        "android_client_info": {
+          "package_name": "com.example.unscramble"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRZA3uHaM4Q6KlZHki1AxATDhZx6ltSPA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
