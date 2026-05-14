@@ -4,18 +4,19 @@
     android:id="@+id/cardViewFood"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginVertical="8dp"
     android:layout_marginHorizontal="20dp"
+    android:layout_marginVertical="8dp"
+    card:cardBackgroundColor="#FCF2E4"
     card:cardCornerRadius="20dp"
-    card:cardUseCompatPadding="true"
     card:cardElevation="0dp"
-    card:cardBackgroundColor="#FCF2E4">
+    card:cardUseCompatPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_food_border"
         android:orientation="vertical"
-        android:background="@drawable/bg_food_border">
+        android:padding="1dp">
 
         <!-- CONTENT -->
         <RelativeLayout
@@ -38,8 +39,8 @@
                 android:id="@+id/imgStar"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
                 android:background="@drawable/bg_button"
                 android:padding="5dp"
                 android:src="@drawable/ic_star_border" />
@@ -50,9 +51,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/imgFood"
-                android:layout_toEndOf="@id/imgFood"
                 android:layout_marginStart="14dp"
                 android:layout_marginEnd="40dp"
+                android:layout_toEndOf="@id/imgFood"
                 android:text="Food Title"
                 android:textColor="#000000"
                 android:textSize="20sp"
@@ -64,10 +65,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/txtTitle"
-                android:layout_toEndOf="@id/imgFood"
                 android:layout_marginStart="14dp"
                 android:layout_marginTop="6dp"
                 android:layout_marginEnd="10dp"
+                android:layout_toEndOf="@id/imgFood"
                 android:lineSpacingExtra="3dp"
                 android:maxLines="4"
                 android:text="Deskripsi makanan akan tampil di sini..."
@@ -80,7 +81,6 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginHorizontal="14dp"
             android:background="#000000" />
 
         <!-- ACTION BAR -->
