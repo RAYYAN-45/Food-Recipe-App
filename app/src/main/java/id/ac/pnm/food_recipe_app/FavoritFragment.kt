@@ -51,7 +51,7 @@ class FavoritFragment : Fragment() {
             bottomNav.selectedItemId = R.id.Home
         }
 
-        setupAdapter()
+        setupAdapter() //menghubungkan adapter → recyclerview
     }
 
     private fun setupAdapter() {
