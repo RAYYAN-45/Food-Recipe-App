@@ -34,17 +34,6 @@
                 android:clipToOutline="true"
                 android:scaleType="centerCrop" />
 
-            <!-- STAR -->
-            <ImageView
-                android:id="@+id/imgStar"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
-                android:background="@drawable/bg_button"
-                android:padding="5dp"
-                android:src="@drawable/ic_star_border" />
-
             <!-- TITLE -->
             <TextView
                 android:id="@+id/txtTitle"
@@ -52,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/imgFood"
                 android:layout_marginStart="14dp"
-                android:layout_marginEnd="40dp"
+                android:layout_marginEnd="10dp"
                 android:layout_toEndOf="@id/imgFood"
                 android:text="Food Title"
                 android:textColor="#000000"
@@ -113,7 +102,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="123"
+                    android:text="0"
                     android:textColor="#7A7A7A"
                     android:textSize="13sp" />
 
@@ -149,7 +138,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="123"
+                    android:text="0"
                     android:textColor="#7A7A7A"
                     android:textSize="13sp" />
 
@@ -184,7 +173,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="123"
+                    android:text="0"
                     android:textColor="#7A7A7A"
                     android:textSize="13sp" />
 
