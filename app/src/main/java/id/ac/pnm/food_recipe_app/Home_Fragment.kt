@@ -2,95 +2,66 @@ package id.ac.pnm.food_recipe_app
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class Home_Fragment : Fragment() {
-    // RecyclerView untuk list makanan
-    private lateinit var recyclerFood: RecyclerView
-    // Adapter untuk menghubungkan data & tampilan RecyclerView
+
     private lateinit var adapter: FoodAdapter
-    // menyimpan semua data makanan (dipakai untuk search)
-    private lateinit var searchField: EditText
 
-    private var originalFoodList = FoodDataSource.getAllFoods() // untuk search
-
-    override fun onCreateView( //mengubah file XML menjadi tampilan nyata (View)
-        inflater: LayoutInflater,
-        container: ViewGroup?, //tempat fragment akan diletakkan
-        savedInstanceState: Bundle? //data lama kalau fragment hidup kembali
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        // menghubungkan fragment dengan file XML fragment_home_
         return inflater.inflate(R.layout.fragment_home_, container, false)
     }
-//onViewCreated() dipanggil setelah layout berhasil dibuat (inflate)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-// hubungkan id RecyclerView dan SearchField dengan XML
-        recyclerFood = view.findViewById(R.id.recyclerFood)
-        searchField = view.findViewById(R.id.editSearch)
-// agar list ditampilkan vertikal
+
+        val recyclerFood = view.findViewById<RecyclerView>(R.id.recyclerFood)
         recyclerFood.layoutManager = LinearLayoutManager(requireContext())
 
-        setupAdapter()  // pasang adapter ke RecyclerView
-        setupSearchBar() // aktifkan pencarian
-    }
-    // memasukkan data ke dalam adapter
-    private fun setupAdapter() {
+        // Inisialisasi adapter dengan 5 lambda/callback
         adapter = FoodAdapter(
-            foodList = originalFoodList,
+            foodList = FoodDataSource.getFoodList(),
+
+            // 1. Klik card → buka Detail_Resep
             onItemClick = { food ->
-                // Klik Card → buka Detail_Resep
                 val intent = Intent(requireContext(), Detail_Resep::class.java)
-                intent.putExtra("Extra_Food", food)
+                intent.putExtra("FOOD_DATA", food)
                 startActivity(intent)
-            },// ketika favorit diklik
-            onFavoriteClick = { food ->
-                // ubah status favorite
+            },
+
+            // 2. Klik komentar → buka Detail_Resep, scroll ke komentar
+            onKomentarClick = { food ->
+                val intent = Intent(requireContext(), Detail_Resep::class.java)
+                intent.putExtra("FOOD_DATA", food)
+                intent.putExtra("SCROLL_TO_KOMENTAR", true)
+                startActivity(intent)
+            },
+
+            // 3. Klik simpan → toggle bookmark (sudah dihandle di adapter)
+            //    Kalau mau simpan ke FoodDataSource juga, tambahkan di sini
+            onSimpanClick = { food ->
                 FoodDataSource.toggleFavorite(food.id)
-                // refresh data pada adapter
-                adapter.updateData(FoodDataSource.getAllFoods())
-                // update list pencarian
-                originalFoodList = FoodDataSource.getAllFoods()
+            },
+
+            // 4. Klik share → buka Android share sheet
+            onShareClick = { food ->
+                val shareText = "Cek resep ${food.title} di EuroCuisine!\n\n${food.desc}"
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, shareText)
+                }
+                startActivity(Intent.createChooser(shareIntent, "Bagikan resep via..."))
             }
         )
 
-        // menghubungkan recyclerView dengan adapter
         recyclerFood.adapter = adapter
-    }
-    // aktifkan fitur pencarian realtime
-    private fun setupSearchBar() {
-        // add listener setiap user mengetik
-        searchField.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: Editable?) {}
-            // realtime filter list
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                filterList(s.toString())
-            }
-        })
-    }
-    // proses penyaringan list sesuai kata kunci
-    private fun filterList(query: String) {
-        // filter berdasarkan judul atau deskripsi
-        val filtered = originalFoodList.filter { food ->
-            food.title.contains(query, ignoreCase = true) ||
-                    food.desc.contains(query, ignoreCase = true)
-        }// tampilkan hasil filter
-        adapter.updateData(filtered)
-    }
-    // dijalankan ketika kembali ke Home
-    override fun onResume() {
-        super.onResume()
-        // refresh ulang data makanan
-        adapter.updateData(FoodDataSource.getAllFoods())
-        originalFoodList = FoodDataSource.getAllFoods()
     }
 }
