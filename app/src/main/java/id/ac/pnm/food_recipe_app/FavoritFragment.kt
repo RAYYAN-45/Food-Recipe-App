@@ -12,69 +12,80 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class FavoritFragment : Fragment() {
-    // RecyclerView untuk menampilkan daftar favorit
+
     private lateinit var recyclerFavorite: RecyclerView
-    // Adapter makanan favorit
     private lateinit var adapter: FoodAdapter
 
-    // Ketika Fragment dibuat (inflate layout) Inflate = mengambil layout XML lalu mengubahnya menjadi object View
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // menghubungkan Fragment dengan file XML fragment_favorite
         return inflater.inflate(R.layout.fragment_favorite, container, false)
     }
-    // Ketika view sudah siap digunakan
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-// hubungkan id RecyclerView di layout dan tombol back (manual karena fragment bukan activity)
         recyclerFavorite = view.findViewById(R.id.recyclerFavorite)
         val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
 
-        // supaya list tampil ke bawah
         recyclerFavorite.layoutManager = LinearLayoutManager(requireContext())
 
         // Tombol Back → kembali ke Home
         btnBack.setOnClickListener {
-            // mengganti isi FrameLayout dengan Home_Fragment
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.Frame_Layout, Home_Fragment())
                 .commit()
 
-// Update icon pada Bottom Navigation
             val bottomNav = requireActivity()
                 .findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-            // pindahkan item bottom nav ke Home
             bottomNav.selectedItemId = R.id.Home
         }
 
-        setupAdapter() //menghubungkan adapter → recyclerview
+        setupAdapter()
     }
 
     private fun setupAdapter() {
-        // ambil list favorit lalu tampilkan
         adapter = FoodAdapter(
             foodList = FoodDataSource.getFavoriteFoods(),
+
+            // Klik card → buka Detail_Resep
             onItemClick = { food ->
-                // Klik Card → buka Detail_Resep
                 val intent = Intent(requireContext(), Detail_Resep::class.java)
                 intent.putExtra("Extra_Food", food)
                 startActivity(intent)
             },
-            onFavoriteClick = { food ->
-                // toggle favorite
-                FoodDataSource.toggleFavorite(food.id)
-                // refresh list favorite
+
+            // Klik komentar → buka Detail_Resep scroll ke komentar
+            onKomentarClick = { food ->
+                val intent = Intent(requireContext(), Detail_Resep::class.java)
+                intent.putExtra("Extra_Food", food)
+                intent.putExtra("SCROLL_TO_KOMENTAR", true)
+                startActivity(intent)
+            },
+
+            // Klik simpan → toggle favorit lalu refresh list
+            // (angka & ikon sudah dihandle di adapter)
+            onSimpanClick = { _ ->
                 adapter.updateData(FoodDataSource.getFavoriteFoods())
+            },
+
+            // Klik share → buka Android share sheet
+            onShareClick = { food ->
+                val shareText = "Cek resep ${food.title} di EuroCuisine!\n\n${food.desc}"
+                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, shareText)
+                }
+                startActivity(Intent.createChooser(shareIntent, "Bagikan resep via..."))
             }
         )
 
-        recyclerFavorite.adapter = adapter //isi daftar makanan ini memakai data dari adapte
+        recyclerFavorite.adapter = adapter
     }
-    // data favorit di-refresh
+
+    // Refresh data favorit + status bookmark setiap kali fragment aktif
     override fun onResume() {
         super.onResume()
         adapter.updateData(FoodDataSource.getFavoriteFoods())
