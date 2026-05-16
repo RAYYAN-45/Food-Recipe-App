@@ -2,23 +2,29 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- SCROLL AREA (semua konten kecuali input bar) -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="#fcf2e4"
         android:padding="16dp"
-        android:fillViewport="true">
-
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/layoutInputKomen"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:id="@+id/layoutContent"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <!-- ===== KODE LAMA TIDAK DIUBAH ===== -->
 
             <!-- FOTO/HEADER -->
             <ImageView
@@ -92,12 +98,121 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- ===== TAMBAHAN BARU: SECTION KOMENTAR ===== -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:contentPadding="16dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="16dp">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- Judul Komentar -->
+                    <TextView
+                        android:id="@+id/txtJudulKomentar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Komentar"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="#5a3e3e"
+                        android:paddingBottom="8dp"/>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#e0d0c0"
+                        android:layout_marginBottom="8dp"/>
+
+                    <!-- RecyclerView Komentar -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvKomentar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
+
+                    <!-- Empty state: tampil kalau belum ada komentar -->
+                    <TextView
+                        android:id="@+id/txtEmptyKomen"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Belum ada komentar. Jadilah yang pertama!"
+                        android:textSize="13sp"
+                        android:textColor="#9E9E9E"
+                        android:gravity="center"
+                        android:paddingVertical="16dp"
+                        android:visibility="visible"/>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Spacer bawah -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="100dp"/>
+                android:layout_height="8dp"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- ===== INPUT KOMENTAR FIXED DI BAWAH ===== -->
+    <LinearLayout
+        android:id="@+id/layoutInputKomen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:padding="10dp"
+        android:gravity="center_vertical"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Foto profil user -->
+        <ImageView
+            android:id="@+id/imgProfilUser"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_star_border"
+            android:scaleType="centerCrop"
+            android:layout_marginEnd="10dp"/>
+
+        <!-- EditText komentar -->
+        <EditText
+            android:id="@+id/editKomentar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Tulis komentar..."
+            android:textSize="14sp"
+            android:textColor="#3A3A3A"
+            android:textColorHint="#9E9E9E"
+            android:background="@drawable/bg_search"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp"
+            android:maxLines="3"
+            android:inputType="textMultiLine"/>
+
+        <!-- Tombol Kirim -->
+        <ImageButton
+            android:id="@+id/btnKirimKomen"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/sent"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:layout_marginStart="8dp"
+            android:contentDescription="Kirim"/>
+
+    </LinearLayout>
+
+    <!-- ===== KODE LAMA: TOMBOL FLOAT ===== -->
 
     <ImageButton
         android:id="@+id/btnBack"
@@ -111,8 +226,7 @@
         android:elevation="6dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="Back">
-    </ImageButton>
+        android:contentDescription="Back"/>
 
     <ImageButton
         android:id="@+id/btnShare"
@@ -120,13 +234,13 @@
         android:layout_height="40dp"
         android:layout_margin="24dp"
         android:background="@drawable/bg_button"
-        android:contentDescription="Back"
+        android:contentDescription="Share"
         android:elevation="6dp"
         android:padding="10dp"
         android:scaleType="center"
         android:src="@drawable/share"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageButton
         android:id="@+id/btnFavorite"
@@ -134,13 +248,12 @@
         android:layout_height="40dp"
         android:layout_margin="24dp"
         android:background="@drawable/bg_button"
-        android:contentDescription="Back"
+        android:contentDescription="Favorit"
         android:elevation="6dp"
         android:padding="10dp"
         android:scaleType="center"
         android:src="@drawable/ic_star_border"
         app:layout_constraintEnd_toStartOf="@+id/btnShare"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
