@@ -26,32 +26,28 @@ class Home_Fragment : Fragment() {
         val recyclerFood = view.findViewById<RecyclerView>(R.id.recyclerFood)
         recyclerFood.layoutManager = LinearLayoutManager(requireContext())
 
-        // Inisialisasi adapter dengan 5 lambda/callback
         adapter = FoodAdapter(
-            foodList = FoodDataSource.getFoodList(),
+            foodList = FoodDataSource.getAllFoods(),
 
-            // 1. Klik card → buka Detail_Resep
+            // Klik card → buka Detail_Resep
             onItemClick = { food ->
                 val intent = Intent(requireContext(), Detail_Resep::class.java)
-                intent.putExtra("FOOD_DATA", food)
+                intent.putExtra("Extra_Food", food)
                 startActivity(intent)
             },
 
-            // 2. Klik komentar → buka Detail_Resep, scroll ke komentar
+            // Klik komentar → buka Detail_Resep scroll ke komentar
             onKomentarClick = { food ->
                 val intent = Intent(requireContext(), Detail_Resep::class.java)
-                intent.putExtra("FOOD_DATA", food)
+                intent.putExtra("Extra_Food", food)
                 intent.putExtra("SCROLL_TO_KOMENTAR", true)
                 startActivity(intent)
             },
 
-            // 3. Klik simpan → toggle bookmark (sudah dihandle di adapter)
-            //    Kalau mau simpan ke FoodDataSource juga, tambahkan di sini
-            onSimpanClick = { food ->
-                FoodDataSource.toggleFavorite(food.id)
-            },
+            // Klik simpan → sudah dihandle di adapter (toggle + update angka)
+            onSimpanClick = { _ -> },
 
-            // 4. Klik share → buka Android share sheet
+            // Klik share → buka Android share sheet
             onShareClick = { food ->
                 val shareText = "Cek resep ${food.title} di EuroCuisine!\n\n${food.desc}"
                 val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -63,5 +59,11 @@ class Home_Fragment : Fragment() {
         )
 
         recyclerFood.adapter = adapter
+    }
+
+    // Refresh angka & status bookmark saat kembali ke Home
+    override fun onResume() {
+        super.onResume()
+        adapter.notifyDataSetChanged()
     }
 }
