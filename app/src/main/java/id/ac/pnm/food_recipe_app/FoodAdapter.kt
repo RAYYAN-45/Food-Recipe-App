@@ -9,12 +9,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-// Adapter menerima:
-// 1. list data
-// 2. event ketika item diklik
-// 3. event ketika tombol komentar diklik
-// 4. event ketika tombol simpan diklik
-// 5. event ketika tombol share diklik
 class FoodAdapter(
     private var foodList: List<Food>,
     private val onItemClick: (Food) -> Unit,
@@ -23,12 +17,7 @@ class FoodAdapter(
     private val onShareClick: (Food) -> Unit
 ) : RecyclerView.Adapter<FoodAdapter.ViewHolder>() {
 
-    // Menyimpan id resep yang sudah di-bookmark
-    private val bookmarkedIds = mutableSetOf<Int>()
-
-    // ViewHolder = penampung tampilan setiap item di RecyclerView
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        // ambil komponen view dari layout item_food.xml
         val imgFood: ImageView           = itemView.findViewById(R.id.imgFood)
         val txtTitle: TextView           = itemView.findViewById(R.id.txtTitle)
         val txtDesc: TextView            = itemView.findViewById(R.id.txtDesc)
@@ -41,86 +30,76 @@ class FoodAdapter(
         val layoutShare: LinearLayout    = itemView.findViewById(R.id.layoutShare)
     }
 
-    // Membuat tampilan item_food.xml untuk setiap row list
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        // "inflate" = mengubah XML menjadi View
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_food, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        // ambil data sesuai posisi
         val food = foodList[position]
 
-        // Menampilkan data (sama seperti kode lama, pakai field yang sama)
+        // Tampilkan data
         holder.txtTitle.text = food.title
         holder.txtDesc.text  = food.desc
         holder.imgFood.setImageResource(food.image)
 
-        // Tampilkan status bookmark pada ikon
-        val isBookmarked = bookmarkedIds.contains(food.id)
-        updateBookmarkIcon(holder.imgBookmark, isBookmarked)
+        // Tampilkan angka dari FoodDataSource (global/shared)
+        holder.txtJumlahKomen.text  = FoodDataSource.getJumlahKomen(food.id).toString()
+        holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
+        holder.txtJumlahShare.text  = FoodDataSource.getJumlahShare(food.id).toString()
 
-        // =============================================
-        // Klik item → pindah ke Detail (sama seperti kode lama)
-        // =============================================
+        // Tampilkan status bookmark dari FoodDataSource (sinkron semua fragment)
+        updateBookmarkIcon(holder.imgBookmark, FoodDataSource.isFavorite(food.id))
+
+        // Klik card → buka Detail
         holder.itemView.setOnClickListener {
             onItemClick(food)
         }
 
-        // =============================================
-        // LISTENER 1: Komentar → callback ke fragment/activity
-        // =============================================
+        // LISTENER 1: Komentar → tambah angka + callback
         holder.layoutKomentar.setOnClickListener {
+            FoodDataSource.tambahKomen(food.id)
+            holder.txtJumlahKomen.text = FoodDataSource.getJumlahKomen(food.id).toString()
             onKomentarClick(food)
         }
 
-        // =============================================
-        // LISTENER 2: Simpan → toggle bookmark + callback
-        // =============================================
+        // LISTENER 2: Simpan → toggle bookmark + update angka + ikon
         holder.layoutSimpan.setOnClickListener {
-            val currentlyBookmarked = bookmarkedIds.contains(food.id)
-            if (currentlyBookmarked) {
-                bookmarkedIds.remove(food.id)
-            } else {
-                bookmarkedIds.add(food.id)
-            }
-            updateBookmarkIcon(holder.imgBookmark, !currentlyBookmarked)
+            FoodDataSource.toggleFavorite(food.id) // toggle sekaligus update jumlahSimpan
+            val isNowBookmarked = FoodDataSource.isFavorite(food.id)
+            updateBookmarkIcon(holder.imgBookmark, isNowBookmarked)
+            holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
             onSimpanClick(food)
         }
 
-        // =============================================
-        // LISTENER 3: Share → callback ke fragment/activity
-        // =============================================
+        // LISTENER 3: Share → tambah angka + callback
         holder.layoutShare.setOnClickListener {
+            FoodDataSource.tambahShare(food.id)
+            holder.txtJumlahShare.text = FoodDataSource.getJumlahShare(food.id).toString()
             onShareClick(food)
         }
     }
 
-    // jumlah item dalam list
-    override fun getItemCount(): Int {
-        return foodList.size
-    }
+    override fun getItemCount(): Int = foodList.size
 
-    // dipanggil kalau ada perubahan list (sama seperti kode lama)
     fun updateData(newList: List<Food>) {
         foodList = newList
-        // refresh tampilan RecyclerView
         notifyDataSetChanged()
     }
 
-    // Helper: update ikon bookmark
+    // Belum disimpan → @drawable/bookmark (outline, warna asli)
+    // Sudah disimpan → @drawable/bookmark_filled (solid hitam penuh)
     private fun updateBookmarkIcon(imgBookmark: ImageView, isBookmarked: Boolean) {
         if (isBookmarked) {
             imgBookmark.setImageResource(R.drawable.bookmark_filled)
         } else {
             imgBookmark.setImageResource(R.drawable.bookmark)
         }
+        imgBookmark.clearColorFilter()
     }
 
-    // Ambil list resep yang sudah di-bookmark (untuk FavoritFragment)
     fun getBookmarkedFoods(): List<Food> {
-        return foodList.filter { bookmarkedIds.contains(it.id) }
+        return foodList.filter { FoodDataSource.isFavorite(it.id) }
     }
 }
