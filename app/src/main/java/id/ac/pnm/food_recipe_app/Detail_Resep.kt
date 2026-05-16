@@ -3,10 +3,10 @@ package id.ac.pnm.food_recipe_app
 import TextAdapter
 import android.content.Intent
 import android.graphics.Bitmap
-import android.media.session.MediaSession
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -17,10 +17,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class Detail_Resep : AppCompatActivity() {
 
-    // Ngambil view dari layout
+    // ===== KODE LAMA =====
     private lateinit var imgHeader: ImageView
     private lateinit var txtJudul: TextView
     private lateinit var rvBahan: RecyclerView
@@ -30,28 +33,47 @@ class Detail_Resep : AppCompatActivity() {
     private lateinit var btnFavorite: ImageView
     private lateinit var layouContent: View
 
+    // ===== TAMBAHAN BARU: KOMENTAR =====
+    private lateinit var rvKomentar: RecyclerView
+    private lateinit var editKomentar: EditText
+    private lateinit var btnKirimKomen: ImageButton
+    private lateinit var txtEmptyKomen: TextView
+    private lateinit var komentarAdapter: KomentarAdapter
+    private val listKomentar = mutableListOf<Komentar>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_resep)
 
-        // Hubungkan id layout ke variable Kotlin
-        imgHeader = findViewById(R.id.imgHeader)
-        txtJudul = findViewById(R.id.txtJudul)
-        rvBahan = findViewById(R.id.rvBahan)
-        rvLangkah = findViewById(R.id.rvLangkah)
-        btnBack = findViewById(R.id.btnBack)
-        btnShare = findViewById(R.id.btnShare)
-        btnFavorite = findViewById(R.id.btnFavorite)
+        // ===== KODE LAMA: hubungkan id layout =====
+        imgHeader    = findViewById(R.id.imgHeader)
+        txtJudul     = findViewById(R.id.txtJudul)
+        rvBahan      = findViewById(R.id.rvBahan)
+        rvLangkah    = findViewById(R.id.rvLangkah)
+        btnBack      = findViewById(R.id.btnBack)
+        btnShare     = findViewById(R.id.btnShare)
+        btnFavorite  = findViewById(R.id.btnFavorite)
         layouContent = findViewById(R.id.layoutContent)
 
-        // Recycler list dibuat vertical
-        rvBahan.layoutManager = LinearLayoutManager(this)
+        // ===== TAMBAHAN BARU: hubungkan id komentar =====
+        rvKomentar    = findViewById(R.id.rvKomentar)
+        editKomentar  = findViewById(R.id.editKomentar)
+        btnKirimKomen = findViewById(R.id.btnKirimKomen)
+        txtEmptyKomen = findViewById(R.id.txtEmptyKomen)
+
+        // ===== KODE LAMA: setup RecyclerView =====
+        rvBahan.layoutManager   = LinearLayoutManager(this)
         rvLangkah.layoutManager = LinearLayoutManager(this)
 
-        // Ambil data food dari Intent
+        // ===== TAMBAHAN BARU: setup RecyclerView komentar =====
+        komentarAdapter = KomentarAdapter(listKomentar)
+        rvKomentar.layoutManager = LinearLayoutManager(this)
+        rvKomentar.adapter = komentarAdapter
+
+        // ===== KODE LAMA: ambil data food dari Intent =====
         val food = intent.getSerializableExtra("Extra_Food") as? Food
 
-        if (food != null){
+        if (food != null) {
 
             // Set judul di action bar
             supportActionBar?.title = food.title
@@ -63,7 +85,7 @@ class Detail_Resep : AppCompatActivity() {
             txtJudul.text = food.title
 
             // Tampilkan data bahan dan langkah
-            rvBahan.adapter = TextAdapter(food.ingredients)
+            rvBahan.adapter   = TextAdapter(food.ingredients)
             rvLangkah.adapter = TextAdapter(food.steps)
 
             // Tombol kembali ke halaman sebelumnya
@@ -82,22 +104,30 @@ class Detail_Resep : AppCompatActivity() {
 
             // Ketika tombol favorite ditekan
             btnFavorite.setOnClickListener {
-
-                // Toggle nyala / mati favorit
                 FoodDataSource.toggleFavorite(food.id)
-
-                // Update status terbaru
                 isFavorite = FoodDataSource.isFavorite(food.id)
-
-                // Update icon nya
                 setFavoriteIcon(isFavorite)
 
-                // Tampilkan pemberitahuan
-                if (isFavorite){
+                if (isFavorite) {
                     Toast.makeText(this, "Tersimpan di favorit", Toast.LENGTH_LONG).show()
                 } else {
                     Toast.makeText(this, "Dihapus dari favorit", Toast.LENGTH_LONG).show()
                 }
+            }
+
+            // ===== TAMBAHAN BARU: kirim komentar =====
+            btnKirimKomen.setOnClickListener {
+                kirimKomentar()
+            }
+
+            // Scroll ke komentar kalau dari tombol komentar di Home
+            val scrollToKomen = intent.getBooleanExtra("SCROLL_TO_KOMENTAR", false)
+            if (scrollToKomen) {
+                findViewById<androidx.core.widget.NestedScrollView>(R.id.nestedScroll)
+                    .post {
+                        findViewById<androidx.core.widget.NestedScrollView>(R.id.nestedScroll)
+                            .smoothScrollTo(0, rvKomentar.bottom)
+                    }
             }
 
         } else {
@@ -105,21 +135,54 @@ class Detail_Resep : AppCompatActivity() {
         }
     }
 
-    // Ubah icon bintang sesuai status favorit
-    private fun setFavoriteIcon(isFav: Boolean){
-        if (isFav){
+    // ===== TAMBAHAN BARU: fungsi kirim komentar =====
+    private fun kirimKomentar() {
+        val isiKomen = editKomentar.text.toString().trim()
+
+        if (isiKomen.isEmpty()) {
+            Toast.makeText(this, "Komentar tidak boleh kosong", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Buat objek komentar baru
+        val waktuSekarang = SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.getDefault())
+            .format(Date())
+
+        val komentar = Komentar(
+            nama  = "Saya",         // nanti bisa diganti nama user dari login
+            isi   = isiKomen,
+            waktu = waktuSekarang
+        )
+
+        // Tambah ke adapter
+        komentarAdapter.tambahKomentar(komentar)
+
+        // Scroll ke atas (komentar terbaru di atas)
+        rvKomentar.scrollToPosition(0)
+
+        // Kosongkan EditText
+        editKomentar.setText("")
+
+        // Sembunyikan empty state
+        txtEmptyKomen.visibility = View.GONE
+
+        Toast.makeText(this, "Komentar terkirim!", Toast.LENGTH_SHORT).show()
+    }
+
+    // ===== KODE LAMA: fungsi icon favorit =====
+    private fun setFavoriteIcon(isFav: Boolean) {
+        if (isFav) {
             btnFavorite.setImageResource(R.drawable.ic_star_filled)
         } else {
             btnFavorite.setImageResource(R.drawable.ic_star_border)
         }
     }
 
-    // Fungsi Share (screenshot layout lalu share gambar-nya)
-    private fun shareImage(food: Food){
+    // ===== KODE LAMA: fungsi share image =====
+    private fun shareImage(food: Food) {
         try {
             val view = layouContent
 
-            // Buat screenshot dari layout
             val bitmap = Bitmap.createBitmap(
                 view.width,
                 view.height,
@@ -130,7 +193,6 @@ class Detail_Resep : AppCompatActivity() {
             canvas.drawColor(android.graphics.Color.WHITE)
             view.draw(canvas)
 
-            // Simpan gambar ke cache
             val cachePath = File(cacheDir, "images")
             cachePath.mkdirs()
 
@@ -138,7 +200,6 @@ class Detail_Resep : AppCompatActivity() {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             stream.close()
 
-            // Convert jadi URI biar bisa dishare
             val newFile = File(cachePath, "FullResep.png")
             val contentUri: Uri = FileProvider.getUriForFile(
                 this,
@@ -146,25 +207,19 @@ class Detail_Resep : AppCompatActivity() {
                 newFile
             )
 
-            // Intent share
-            if (contentUri != null){
-
+            if (contentUri != null) {
                 val shareIntent = Intent(Intent.ACTION_SEND)
-
                 shareIntent.setDataAndType(contentUri, contentResolver.getType(contentUri))
                 shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
                 shareIntent.type = "image/png"
                 shareIntent.clipData = android.content.ClipData.newRawUri(null, contentUri)
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-
-                // Munculkan menu Share Android
-                startActivity(Intent.createChooser(shareIntent,"Bagikan Resep"))
+                startActivity(Intent.createChooser(shareIntent, "Bagikan Resep"))
             }
 
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
             Toast.makeText(this, "Gagal memuat gambar", Toast.LENGTH_LONG).show()
         }
     }
 }
-
