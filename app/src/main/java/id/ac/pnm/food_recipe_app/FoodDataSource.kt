@@ -1,16 +1,18 @@
 package id.ac.pnm.food_recipe_app
 
-// Tempat nyimpan semua data makanan
 object FoodDataSource {
 
     // Set untuk nyimpan ID makanan yang difavoritkan
-    // Contoh: jika Paella (id=2) difavoritkan, maka favoriteIds = [2]
     private val favoriteIds = mutableSetOf<Int>()
+
+    // Map untuk nyimpan jumlah komentar, simpan, share per food id
+    private val jumlahKomenMap  = mutableMapOf<Int, Int>()
+    private val jumlahSimpanMap = mutableMapOf<Int, Int>()
+    private val jumlahShareMap  = mutableMapOf<Int, Int>()
 
     // Fungsi untuk dapat semua makanan
     fun getAllFoods(): List<Food> {
         return listOf(
-            // Makanan 1: Boeuf Bourguignon
             Food(
                 id = 1,
                 title = "Boeuf Bourguignon",
@@ -36,7 +38,6 @@ object FoodDataSource {
                     "Sajikan hangat"
                 )
             ),
-            // Makanan 2: Paella
             Food(
                 id = 2,
                 title = "Paella",
@@ -64,7 +65,6 @@ object FoodDataSource {
                     "Sajikan dengan lemon"
                 )
             ),
-            // Makanan 3: Souvlaki
             Food(
                 id = 3,
                 title = "Souvlaki",
@@ -92,29 +92,39 @@ object FoodDataSource {
         )
     }
 
-    // Fungsi untuk tambah/hapus favorit
-    // Kalau sudah favorit -> hapus
-    // Kalau belum favorit -> tambah
+    // ===================== FAVORIT =====================
+
     fun toggleFavorite(foodId: Int) {
         if (favoriteIds.contains(foodId)) {
-            // Kalau sudah ada, hapus dari favorit
             favoriteIds.remove(foodId)
+            // kurangi jumlah simpan
+            jumlahSimpanMap[foodId] = maxOf(0, (jumlahSimpanMap[foodId] ?: 0) - 1)
         } else {
-            // Kalau belum ada, tambahkan ke favorit
             favoriteIds.add(foodId)
+            // tambah jumlah simpan
+            jumlahSimpanMap[foodId] = (jumlahSimpanMap[foodId] ?: 0) + 1
         }
     }
 
-    // Fungsi cek apakah makanan ini sudah difavoritkan
     fun isFavorite(foodId: Int): Boolean {
         return favoriteIds.contains(foodId)
     }
 
-    // Fungsi untuk dapat makanan yang difavoritkan aja
     fun getFavoriteFoods(): List<Food> {
-        // Ambil semua makanan, filter yang ID nya ada di favoriteIds
-        return getAllFoods().filter { food ->
-            favoriteIds.contains(food.id)
-        }
+        return getAllFoods().filter { food -> favoriteIds.contains(food.id) }
+    }
+
+    // ===================== JUMLAH =====================
+
+    fun getJumlahKomen(foodId: Int): Int  = jumlahKomenMap[foodId] ?: 0
+    fun getJumlahSimpan(foodId: Int): Int = jumlahSimpanMap[foodId] ?: 0
+    fun getJumlahShare(foodId: Int): Int  = jumlahShareMap[foodId] ?: 0
+
+    fun tambahKomen(foodId: Int) {
+        jumlahKomenMap[foodId] = (jumlahKomenMap[foodId] ?: 0) + 1
+    }
+
+    fun tambahShare(foodId: Int) {
+        jumlahShareMap[foodId] = (jumlahShareMap[foodId] ?: 0) + 1
     }
 }

@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.gms.google-services")
+    //id("com.google.gms.google-services")
 }
 
 apply(plugin = "kotlin-parcelize")
@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:34.13.0"))
+   // implementation(platform("com.google.firebase:firebase-bom:34.13.0"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
