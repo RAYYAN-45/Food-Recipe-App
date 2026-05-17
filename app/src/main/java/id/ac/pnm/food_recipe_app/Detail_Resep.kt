@@ -33,13 +33,13 @@ class Detail_Resep : AppCompatActivity() {
     private lateinit var btnFavorite: ImageView
     private lateinit var layouContent: View
 
-    // ===== TAMBAHAN BARU: KOMENTAR =====
+    // ===== KOMENTAR =====
     private lateinit var rvKomentar: RecyclerView
     private lateinit var editKomentar: EditText
     private lateinit var btnKirimKomen: ImageButton
     private lateinit var txtEmptyKomen: TextView
     private lateinit var komentarAdapter: KomentarAdapter
-    private val listKomentar = mutableListOf<Komentar>()
+    private var foodId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +55,7 @@ class Detail_Resep : AppCompatActivity() {
         btnFavorite  = findViewById(R.id.btnFavorite)
         layouContent = findViewById(R.id.layoutContent)
 
-        // ===== TAMBAHAN BARU: hubungkan id komentar =====
+        // ===== KOMENTAR: hubungkan id =====
         rvKomentar    = findViewById(R.id.rvKomentar)
         editKomentar  = findViewById(R.id.editKomentar)
         btnKirimKomen = findViewById(R.id.btnKirimKomen)
@@ -64,16 +64,14 @@ class Detail_Resep : AppCompatActivity() {
         // ===== KODE LAMA: setup RecyclerView =====
         rvBahan.layoutManager   = LinearLayoutManager(this)
         rvLangkah.layoutManager = LinearLayoutManager(this)
-
-        // ===== TAMBAHAN BARU: setup RecyclerView komentar =====
-        komentarAdapter = KomentarAdapter(listKomentar)
         rvKomentar.layoutManager = LinearLayoutManager(this)
-        rvKomentar.adapter = komentarAdapter
 
         // ===== KODE LAMA: ambil data food dari Intent =====
         val food = intent.getSerializableExtra("Extra_Food") as? Food
 
         if (food != null) {
+
+            foodId = food.id
 
             // Set judul di action bar
             supportActionBar?.title = food.title
@@ -88,26 +86,28 @@ class Detail_Resep : AppCompatActivity() {
             rvBahan.adapter   = TextAdapter(food.ingredients)
             rvLangkah.adapter = TextAdapter(food.steps)
 
-            // Tombol kembali ke halaman sebelumnya
-            btnBack.setOnClickListener {
-                finish()
-            }
+            // ===== KOMENTAR: ambil REFERENSI LIST dari FoodDataSource =====
+            // Karena ini referensi (bukan copy), data tidak akan hilang
+            // walaupun Activity di-recreate / pindah menu
+            val listKomentar = FoodDataSource.getKomentar(food.id)
+            komentarAdapter = KomentarAdapter(listKomentar)
+            rvKomentar.adapter = komentarAdapter
+            updateEmptyState()
 
-            // Tombol Share memanggil fungsi shareImage
-            btnShare.setOnClickListener {
-                shareImage(food)
-            }
+            // ===== KODE LAMA: tombol back =====
+            btnBack.setOnClickListener { finish() }
 
-            // Cek status favorit pertama kali
+            // ===== KODE LAMA: tombol share =====
+            btnShare.setOnClickListener { shareImage(food) }
+
+            // ===== KODE LAMA: tombol favorit =====
             var isFavorite = FoodDataSource.isFavorite(food.id)
             setFavoriteIcon(isFavorite)
 
-            // Ketika tombol favorite ditekan
             btnFavorite.setOnClickListener {
                 FoodDataSource.toggleFavorite(food.id)
                 isFavorite = FoodDataSource.isFavorite(food.id)
                 setFavoriteIcon(isFavorite)
-
                 if (isFavorite) {
                     Toast.makeText(this, "Tersimpan di favorit", Toast.LENGTH_LONG).show()
                 } else {
@@ -115,19 +115,15 @@ class Detail_Resep : AppCompatActivity() {
                 }
             }
 
-            // ===== TAMBAHAN BARU: kirim komentar =====
-            btnKirimKomen.setOnClickListener {
-                kirimKomentar()
-            }
+            // ===== KOMENTAR: tombol kirim =====
+            btnKirimKomen.setOnClickListener { kirimKomentar() }
 
-            // Scroll ke komentar kalau dari tombol komentar di Home
-            val scrollToKomen = intent.getBooleanExtra("SCROLL_TO_KOMENTAR", false)
-            if (scrollToKomen) {
-                findViewById<androidx.core.widget.NestedScrollView>(R.id.nestedScroll)
-                    .post {
-                        findViewById<androidx.core.widget.NestedScrollView>(R.id.nestedScroll)
-                            .smoothScrollTo(0, rvKomentar.bottom)
-                    }
+            // Scroll ke komentar kalau dibuka dari tombol komentar di Home
+            if (intent.getBooleanExtra("SCROLL_TO_KOMENTAR", false)) {
+                findViewById<androidx.core.widget.NestedScrollView>(R.id.nestedScroll).post {
+                    findViewById<androidx.core.widget.NestedScrollView>(R.id.nestedScroll)
+                        .smoothScrollTo(0, rvKomentar.bottom)
+                }
             }
 
         } else {
@@ -135,7 +131,17 @@ class Detail_Resep : AppCompatActivity() {
         }
     }
 
-    // ===== TAMBAHAN BARU: fungsi kirim komentar =====
+    // Dipanggil setiap kali Activity kembali ke foreground
+    // Supaya komentar selalu up-to-date
+    override fun onResume() {
+        super.onResume()
+        if (foodId != -1) {
+            komentarAdapter.notifyDataSetChanged()
+            updateEmptyState()
+        }
+    }
+
+    // ===== KOMENTAR: fungsi kirim =====
     private fun kirimKomentar() {
         val isiKomen = editKomentar.text.toString().trim()
 
@@ -144,78 +150,75 @@ class Detail_Resep : AppCompatActivity() {
             return
         }
 
-        // Buat objek komentar baru
-        val waktuSekarang = SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.getDefault())
-            .format(Date())
+        val waktu = SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.getDefault()).format(Date())
 
         val komentar = Komentar(
-            nama  = "Saya",         // nanti bisa diganti nama user dari login
+            nama  = "Saya",  // nanti ganti nama user dari login
             isi   = isiKomen,
-            waktu = waktuSekarang
+            waktu = waktu
         )
 
-        // Tambah ke adapter
-        komentarAdapter.tambahKomentar(komentar)
+        // Simpan ke FoodDataSource — data tersimpan global selama app hidup
+        FoodDataSource.tambahKomentar(foodId, komentar)
 
-        // Scroll ke atas (komentar terbaru di atas)
+        // Refresh adapter
+        komentarAdapter.notifyItemInserted(0)
         rvKomentar.scrollToPosition(0)
 
-        // Kosongkan EditText
         editKomentar.setText("")
-
-        // Sembunyikan empty state
-        txtEmptyKomen.visibility = View.GONE
+        updateEmptyState()
 
         Toast.makeText(this, "Komentar terkirim!", Toast.LENGTH_SHORT).show()
     }
 
-    // ===== KODE LAMA: fungsi icon favorit =====
-    private fun setFavoriteIcon(isFav: Boolean) {
-        if (isFav) {
-            btnFavorite.setImageResource(R.drawable.ic_star_filled)
+    private fun updateEmptyState() {
+        txtEmptyKomen.visibility = if (FoodDataSource.getJumlahKomenAktual(foodId) == 0) {
+            View.VISIBLE
         } else {
-            btnFavorite.setImageResource(R.drawable.ic_star_border)
+            View.GONE
         }
     }
 
-    // ===== KODE LAMA: fungsi share image =====
+    // ===== KODE LAMA: icon favorit =====
+    private fun setFavoriteIcon(isFav: Boolean) {
+        if (isFav) {
+            // Sudah disimpan → bookmark putih SOLID/PENUH
+            btnFavorite.setImageResource(R.drawable.bookmark_white_filled)
+        } else {
+            // Belum disimpan → bookmark_1 (drawable yang sudah ada di project)
+            btnFavorite.setImageResource(R.drawable.bookmark_1)
+        }
+    }
+
+    // ===== KODE LAMA: share image =====
     private fun shareImage(food: Food) {
         try {
-            val view = layouContent
-
             val bitmap = Bitmap.createBitmap(
-                view.width,
-                view.height,
-                Bitmap.Config.ARGB_8888
+                layouContent.width, layouContent.height, Bitmap.Config.ARGB_8888
             )
-
             val canvas = android.graphics.Canvas(bitmap)
             canvas.drawColor(android.graphics.Color.WHITE)
-            view.draw(canvas)
+            layouContent.draw(canvas)
 
             val cachePath = File(cacheDir, "images")
             cachePath.mkdirs()
-
             val stream = FileOutputStream("$cachePath/FullResep.png")
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             stream.close()
 
-            val newFile = File(cachePath, "FullResep.png")
             val contentUri: Uri = FileProvider.getUriForFile(
-                this,
-                "id.ac.pnm.food_recipe_app.provider",
-                newFile
+                this, "id.ac.pnm.food_recipe_app.provider",
+                File(cachePath, "FullResep.png")
             )
 
-            if (contentUri != null) {
-                val shareIntent = Intent(Intent.ACTION_SEND)
-                shareIntent.setDataAndType(contentUri, contentResolver.getType(contentUri))
-                shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri)
-                shareIntent.type = "image/png"
-                shareIntent.clipData = android.content.ClipData.newRawUri(null, contentUri)
-                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                startActivity(Intent.createChooser(shareIntent, "Bagikan Resep"))
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                setDataAndType(contentUri, contentResolver.getType(contentUri))
+                putExtra(Intent.EXTRA_STREAM, contentUri)
+                type = "image/png"
+                clipData = android.content.ClipData.newRawUri(null, contentUri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
+            startActivity(Intent.createChooser(shareIntent, "Bagikan Resep"))
 
         } catch (e: Exception) {
             e.printStackTrace()
