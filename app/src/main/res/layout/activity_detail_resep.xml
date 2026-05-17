@@ -238,7 +238,7 @@
         android:elevation="6dp"
         android:padding="10dp"
         android:scaleType="center"
-        android:src="@drawable/share"
+        android:src="@drawable/telegramapp_1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -252,7 +252,7 @@
         android:elevation="6dp"
         android:padding="10dp"
         android:scaleType="center"
-        android:src="@drawable/ic_star_border"
+        android:src="@drawable/bookmark_1"
         app:layout_constraintEnd_toStartOf="@+id/btnShare"
         app:layout_constraintTop_toTopOf="parent"/>
 
