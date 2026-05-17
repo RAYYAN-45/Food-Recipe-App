@@ -45,7 +45,7 @@ class FoodAdapter(
         holder.imgFood.setImageResource(food.image)
 
         // Tampilkan angka dari FoodDataSource (global/shared)
-        holder.txtJumlahKomen.text  = FoodDataSource.getJumlahKomen(food.id).toString()
+        holder.txtJumlahKomen.text  = FoodDataSource.getJumlahKomenAktual(food.id).toString()
         holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
         holder.txtJumlahShare.text  = FoodDataSource.getJumlahShare(food.id).toString()
 
@@ -57,10 +57,9 @@ class FoodAdapter(
             onItemClick(food)
         }
 
-        // LISTENER 1: Komentar → tambah angka + callback
+        // LISTENER 1: Komentar → buka detail resep, angka diambil dari jumlah komentar aktual
         holder.layoutKomentar.setOnClickListener {
-            FoodDataSource.tambahKomen(food.id)
-            holder.txtJumlahKomen.text = FoodDataSource.getJumlahKomen(food.id).toString()
+            holder.txtJumlahKomen.text = FoodDataSource.getJumlahKomenAktual(food.id).toString()
             onKomentarClick(food)
         }
 
