@@ -10,6 +10,10 @@ object FoodDataSource {
     private val jumlahSimpanMap = mutableMapOf<Int, Int>()
     private val jumlahShareMap  = mutableMapOf<Int, Int>()
 
+    // ===== TAMBAHAN: simpan list komentar per food id =====
+    // Key = food.id, Value = list komentar untuk food tersebut
+    private val komentarMap = mutableMapOf<Int, MutableList<Komentar>>()
+
     // Fungsi untuk dapat semua makanan
     fun getAllFoods(): List<Food> {
         return listOf(
@@ -97,18 +101,14 @@ object FoodDataSource {
     fun toggleFavorite(foodId: Int) {
         if (favoriteIds.contains(foodId)) {
             favoriteIds.remove(foodId)
-            // kurangi jumlah simpan
             jumlahSimpanMap[foodId] = maxOf(0, (jumlahSimpanMap[foodId] ?: 0) - 1)
         } else {
             favoriteIds.add(foodId)
-            // tambah jumlah simpan
             jumlahSimpanMap[foodId] = (jumlahSimpanMap[foodId] ?: 0) + 1
         }
     }
 
-    fun isFavorite(foodId: Int): Boolean {
-        return favoriteIds.contains(foodId)
-    }
+    fun isFavorite(foodId: Int): Boolean = favoriteIds.contains(foodId)
 
     fun getFavoriteFoods(): List<Food> {
         return getAllFoods().filter { food -> favoriteIds.contains(food.id) }
@@ -120,11 +120,31 @@ object FoodDataSource {
     fun getJumlahSimpan(foodId: Int): Int = jumlahSimpanMap[foodId] ?: 0
     fun getJumlahShare(foodId: Int): Int  = jumlahShareMap[foodId] ?: 0
 
-    fun tambahKomen(foodId: Int) {
-        jumlahKomenMap[foodId] = (jumlahKomenMap[foodId] ?: 0) + 1
-    }
-
     fun tambahShare(foodId: Int) {
         jumlahShareMap[foodId] = (jumlahShareMap[foodId] ?: 0) + 1
     }
+
+    // ===================== KOMENTAR =====================
+
+    // Ambil list komentar untuk food tertentu
+    // Kalau belum ada, buat list kosong dulu
+    fun getKomentar(foodId: Int): MutableList<Komentar> {
+        if (!komentarMap.containsKey(foodId)) {
+            komentarMap[foodId] = mutableListOf()
+        }
+        return komentarMap[foodId]!!
+    }
+
+    // Tambah komentar baru untuk food tertentu
+    fun tambahKomentar(foodId: Int, komentar: Komentar) {
+        if (!komentarMap.containsKey(foodId)) {
+            komentarMap[foodId] = mutableListOf()
+        }
+        komentarMap[foodId]!!.add(0, komentar) // tambah di paling atas
+        // update jumlah komentar
+        jumlahKomenMap[foodId] = komentarMap[foodId]!!.size
+    }
+
+    // Ambil jumlah komentar aktual dari list
+    fun getJumlahKomenAktual(foodId: Int): Int = komentarMap[foodId]?.size ?: 0
 }
