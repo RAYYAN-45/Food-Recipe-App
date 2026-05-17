@@ -166,7 +166,7 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/sent" />
+                    android:src="@drawable/telegram_app" />
 
                 <TextView
                     android:id="@+id/txtJumlahShare"
