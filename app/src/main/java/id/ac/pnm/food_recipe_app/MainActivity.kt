@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
                     loadFragment(Home_Fragment())
                     true
                 }
+                R.id.Komunitas -> {
+                    loadFragment(Komun_Fragment())
+                    true
+                }
                 //kondisi ketika fevorite fragment
                 R.id.Favorite -> {
                     loadFragment(FavoritFragment())
