@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
                     loadFragment(Home_Fragment())
                     true
                 }
+                //Kondisi Ketika komun fragment
                 R.id.Komunitas -> {
                     loadFragment(Komun_Fragment())
                     true
