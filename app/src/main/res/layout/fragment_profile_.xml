@@ -6,33 +6,65 @@
     android:background="#fcf2e4"
     tools:context=".Profile_Fragment">
 
-    <TextView
-        android:id="@+id/TextViewUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="90dp"
-        android:text="Hai, User"
-        android:textColor="#c27851"
-        android:textSize="30dp" />
-
+    <!-- FOTO PROFIL -->
     <ImageView
         android:id="@+id/GambarProfil"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_marginTop="50dp"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
         android:src="@drawable/desaintanpa" />
 
-    <Button
+    <!-- USERNAME -->
+    <TextView
+        android:id="@+id/TextViewUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="270dp"
+        android:text="Hai, User"
+        android:textColor="#7A3E3E"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <!-- LOG OUT -->
+    <TextView
         android:id="@+id/BtnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="200dp"
-        android:backgroundTint="#c27851"
-        android:text="Log out"
-        android:textColor="#fcf2e4"
-        android:textSize="20dp" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="320dp"
+        android:text="Log Out"
+        android:textColor="#000000"
+        android:textSize="18sp" />
+
+    <!-- TEXT POSTINGAN -->
+    <TextView
+        android:id="@+id/TxtPostingan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="390dp"
+        android:text="postingan saya"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:textStyle="italic" />
+
+    <!-- GARIS -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="435dp"
+        android:layout_marginEnd="20dp"
+        android:background="#000000" />
+
+    <!-- RECYCLERVIEW -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerPostingan"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="450dp"
+        android:padding="20dp" />
+
 </FrameLayout>
