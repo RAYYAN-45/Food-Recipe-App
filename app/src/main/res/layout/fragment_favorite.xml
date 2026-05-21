@@ -4,19 +4,6 @@
     android:layout_height="match_parent"
     android:background="#fcf2e4">
 
-    <!-- Icon Back (Kiri Atas) -->
-    <ImageButton
-        android:id="@+id/btnBack"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/back"
-        android:background="@android:color/transparent"
-        android:scaleType="fitCenter"
-        android:padding="8dp"
-        android:tint="#8B4513"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp" />
-
     <!-- Title -->
     <TextView
         android:id="@+id/txtFavoriteTitle"

@@ -28,21 +28,9 @@ class FavoritFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         recyclerFavorite = view.findViewById(R.id.recyclerFavorite)
-        val btnBack = view.findViewById<ImageButton>(R.id.btnBack)
 
         recyclerFavorite.layoutManager = LinearLayoutManager(requireContext())
-
-        // Tombol Back → kembali ke Home
-        btnBack.setOnClickListener {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.Frame_Layout, Home_Fragment())
-                .commit()
-
-            val bottomNav = requireActivity()
-                .findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-            bottomNav.selectedItemId = R.id.Home
-        }
-
+        
         setupAdapter()
     }
 

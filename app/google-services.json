@@ -1,22 +1,21 @@
 {
   "project_info": {
-    "project_number": "488777845707",
-    "firebase_url": "https://unscramble-ffc25-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "project_id": "unscramble-ffc25",
-    "storage_bucket": "unscramble-ffc25.firebasestorage.app"
+    "project_number": "579455025014",
+    "project_id": "eurocuisine-5df69",
+    "storage_bucket": "eurocuisine-5df69.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:488777845707:android:1d65ae515cafe068e4044e",
+        "mobilesdk_app_id": "1:579455025014:android:da5d81acb04ea13c634457",
         "android_client_info": {
-          "package_name": "com.example.unscramble"
+          "package_name": "id.ac.pnm.food_recipe_app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBRZA3uHaM4Q6KlZHki1AxATDhZx6ltSPA"
+          "current_key": "AIzaSyA4lmfcUTJ5PKB-n1WJ11fO6AXREOJcKlw"
         }
       ],
       "services": {

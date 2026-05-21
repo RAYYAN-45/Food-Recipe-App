@@ -9,6 +9,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,18 +22,34 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
+        val auth = FirebaseAuth.getInstance()
+
         val editTextTextEmailAddress: EditText = findViewById<EditText>(R.id.editTextTextEmailAddress)
         val editTextTextPassword: EditText = findViewById<EditText>(R.id.editTextTextPassword)
         val buttonLogin: Button = findViewById<Button>(R.id.buttonLogin)
 
         buttonLogin.setOnClickListener {
-            val email = editTextTextEmailAddress.text.toString()
-            val intentLoginToMain = Intent(this, MainActivity::class.java)
+            val email = editTextTextEmailAddress.text.toString().trim()
+            val password = editTextTextPassword.text.toString().trim()
 
-            //mengambil username
-            intentLoginToMain.putExtra("Username", email)
-            Toast.makeText(this, "Login Berhasl", Toast.LENGTH_LONG).show()
-            startActivity(intentLoginToMain)
+            if (email.isEmpty() || password.isEmpty()){
+                Toast.makeText(this, "Email dan Password tidak boleh kosong", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this) { task ->
+                    if (task.isSuccessful){
+                        Toast.makeText(this, "Login Berhasil", Toast.LENGTH_LONG).show()
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                        //mengambil username
+                        intent.putExtra("Username", email)
+                    } else {
+                        Toast.makeText(this, "Username atau Kata Sandi Salah", Toast.LENGTH_LONG).show()
+                    }
+                }
+
         }
     }
 }
