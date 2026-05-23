@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import org.w3c.dom.Text
 
 // TODO: Rename parameter arguments, choose names that match
@@ -47,16 +49,25 @@ class Profile_Fragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //mengambil username dari MainActivity
-        val username = activity?.intent?.getStringExtra("Username")
+        val username = FirebaseAuth.getInstance().currentUser
         val TextViewUsername = view.findViewById<TextView>(R.id.TextViewUsername)
-        TextViewUsername.text ="Hai, $username"
+
+        if(username != null){
+            val user = username.displayName
+
+            TextViewUsername.text = user ?: "Pengguna Baru"
+        }
 
         //button logout
         val btnLogout = view.findViewById<Button>(R.id.BtnLogout)
         btnLogout.setOnClickListener{
-            val intent = Intent(requireActivity(), LoginActivity::class.java)
+            FirebaseAuth.getInstance().signOut()
+
+            Toast.makeText(requireContext(), "Telah Log Out", Toast.LENGTH_SHORT).show()
+
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            intent.flags  = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
-            //setelah diklik tidak bisa kembali ke halaman profile
             requireActivity().finish()
         }
     }

@@ -69,6 +69,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:text="Username Akun"
+        android:inputType="text"
         android:textColor="#c27851"
         app:layout_constraintStart_toStartOf="@+id/editTextTextUsername"
         app:layout_constraintTop_toBottomOf="@+id/editTextTextEmailAddress" />
@@ -85,7 +86,6 @@
         android:hint="Masukkan Username"
         android:textColorHint="#9e9e9e"
         android:textColor="@color/black"
-        android:inputType="textPassword"
         android:background="@drawable/bg_input_stroke"
         app:layout_constraintEnd_toEndOf="@+id/editTextTextEmailAddress"
         app:layout_constraintStart_toStartOf="@+id/editTextTextEmailAddress"
@@ -127,8 +127,20 @@
         android:layout_marginTop="40dp"
         android:text="Daftar"
         android:backgroundTint="#c27851"
+        android:textColor="#ffffff"
         app:layout_constraintEnd_toEndOf="@+id/editTextTextPassword"
         app:layout_constraintStart_toStartOf="@+id/editTextTextPassword"
         app:layout_constraintTop_toBottomOf="@+id/editTextTextPassword" />
+
+    <Button
+        android:id="@+id/buttonKembali"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kembali"
+        android:background="@android:color/transparent"
+        android:textColor="#4a154b"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonRegister" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

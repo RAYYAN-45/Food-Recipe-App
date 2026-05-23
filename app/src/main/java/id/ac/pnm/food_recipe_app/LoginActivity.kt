@@ -27,6 +27,7 @@ class LoginActivity : AppCompatActivity() {
         val editTextTextEmailAddress: EditText = findViewById<EditText>(R.id.editTextTextEmailAddress)
         val editTextTextPassword: EditText = findViewById<EditText>(R.id.editTextTextPassword)
         val buttonLogin: Button = findViewById<Button>(R.id.buttonLogin)
+        val buttonDaftar: Button = findViewById<Button>(R.id.buttonDaftar)
 
         buttonLogin.setOnClickListener {
             val email = editTextTextEmailAddress.text.toString().trim()
@@ -50,6 +51,23 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
 
+        }
+
+        buttonDaftar.setOnClickListener {
+            val intentToRegister = Intent(this, RegisterActivity::class.java)
+            startActivity(intentToRegister)
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        if(currentUser != null){
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 }
