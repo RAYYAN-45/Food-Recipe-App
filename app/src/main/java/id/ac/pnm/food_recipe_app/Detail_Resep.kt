@@ -13,8 +13,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import id.ac.pnm.food_recipe_app.data.local.database.FoodDatabase
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -101,17 +104,26 @@ class Detail_Resep : AppCompatActivity() {
             btnShare.setOnClickListener { shareImage(food) }
 
             // ===== KODE LAMA: tombol favorit =====
-            var isFavorite = FoodDataSource.isFavorite(food.id)
+
+            val db = FoodDatabase.getDatabase(this)
+
+            var isFavorite = food.isFavorite
             setFavoriteIcon(isFavorite)
 
             btnFavorite.setOnClickListener {
-                FoodDataSource.toggleFavorite(food.id)
-                isFavorite = FoodDataSource.isFavorite(food.id)
-                setFavoriteIcon(isFavorite)
-                if (isFavorite) {
-                    Toast.makeText(this, "Tersimpan di favorit", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this, "Dihapus dari favorit", Toast.LENGTH_LONG).show()
+                isFavorite = !isFavorite
+                lifecycleScope.launch {
+                    db.foodDao().updateFavorite(food.id, isFavorite)
+
+                    runOnUiThread {
+                        setFavoriteIcon(isFavorite)
+
+                        if(isFavorite){
+                            Toast.makeText(this@Detail_Resep, "Tersimpan di Favorit", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this@Detail_Resep, "Dihapus Dari Favorit", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
 

@@ -18,16 +18,16 @@ class FoodAdapter(
 ) : RecyclerView.Adapter<FoodAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imgFood: ImageView           = itemView.findViewById(R.id.imgFood)
-        val txtTitle: TextView           = itemView.findViewById(R.id.txtTitle)
-        val txtDesc: TextView            = itemView.findViewById(R.id.txtDesc)
-        val txtJumlahKomen: TextView     = itemView.findViewById(R.id.txtJumlahKomen)
-        val txtJumlahSimpan: TextView    = itemView.findViewById(R.id.txtJumlahSimpan)
-        val txtJumlahShare: TextView     = itemView.findViewById(R.id.txtJumlahShare)
-        val imgBookmark: ImageView       = itemView.findViewById(R.id.imgBookmark)
+        val imgFood: ImageView = itemView.findViewById(R.id.imgFood)
+        val txtTitle: TextView = itemView.findViewById(R.id.txtTitle)
+        val txtDesc: TextView = itemView.findViewById(R.id.txtDesc)
+        val txtJumlahKomen: TextView = itemView.findViewById(R.id.txtJumlahKomen)
+        val txtJumlahSimpan: TextView = itemView.findViewById(R.id.txtJumlahSimpan)
+        val txtJumlahShare: TextView = itemView.findViewById(R.id.txtJumlahShare)
+        val imgBookmark: ImageView = itemView.findViewById(R.id.imgBookmark)
         val layoutKomentar: LinearLayout = itemView.findViewById(R.id.layoutKomentar)
-        val layoutSimpan: LinearLayout   = itemView.findViewById(R.id.layoutSimpan)
-        val layoutShare: LinearLayout    = itemView.findViewById(R.id.layoutShare)
+        val layoutSimpan: LinearLayout = itemView.findViewById(R.id.layoutSimpan)
+        val layoutShare: LinearLayout = itemView.findViewById(R.id.layoutShare)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -41,16 +41,16 @@ class FoodAdapter(
 
         // Tampilkan data
         holder.txtTitle.text = food.title
-        holder.txtDesc.text  = food.desc
+        holder.txtDesc.text = food.desc
         holder.imgFood.setImageResource(food.image)
 
         // Tampilkan angka dari FoodDataSource (global/shared)
-        holder.txtJumlahKomen.text  = FoodDataSource.getJumlahKomenAktual(food.id).toString()
+        holder.txtJumlahKomen.text = FoodDataSource.getJumlahKomenAktual(food.id).toString()
         holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
-        holder.txtJumlahShare.text  = FoodDataSource.getJumlahShare(food.id).toString()
+        holder.txtJumlahShare.text = FoodDataSource.getJumlahShare(food.id).toString()
 
         // Tampilkan status bookmark dari FoodDataSource (sinkron semua fragment)
-        updateBookmarkIcon(holder.imgBookmark, FoodDataSource.isFavorite(food.id))
+        updateBookmarkIcon(holder.imgBookmark, food.isFavorite)
 
         // Klik card → buka Detail
         holder.itemView.setOnClickListener {
@@ -65,10 +65,6 @@ class FoodAdapter(
 
         // LISTENER 2: Simpan → toggle bookmark + update angka + ikon
         holder.layoutSimpan.setOnClickListener {
-            FoodDataSource.toggleFavorite(food.id) // toggle sekaligus update jumlahSimpan
-            val isNowBookmarked = FoodDataSource.isFavorite(food.id)
-            updateBookmarkIcon(holder.imgBookmark, isNowBookmarked)
-            holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
             onSimpanClick(food)
         }
 
@@ -96,9 +92,5 @@ class FoodAdapter(
             imgBookmark.setImageResource(R.drawable.bookmark)
         }
         imgBookmark.clearColorFilter()
-    }
-
-    fun getBookmarkedFoods(): List<Food> {
-        return foodList.filter { FoodDataSource.isFavorite(it.id) }
     }
 }

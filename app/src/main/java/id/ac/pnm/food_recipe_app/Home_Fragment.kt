@@ -8,6 +8,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.lifecycle.lifecycleScope
+import id.ac.pnm.food_recipe_app.data.local.database.FoodDatabase
+import id.ac.pnm.food_recipe_app.data.local.toFood
+import kotlinx.coroutines.launch
 
 class Home_Fragment : Fragment() {
 
@@ -26,44 +30,67 @@ class Home_Fragment : Fragment() {
         val recyclerFood = view.findViewById<RecyclerView>(R.id.recyclerFood)
         recyclerFood.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = FoodAdapter(
-            foodList = FoodDataSource.getAllFoods(),
+        val db = FoodDatabase.getDatabase(requireContext())
 
-            // Klik card → buka Detail_Resep
-            onItemClick = { food ->
-                val intent = Intent(requireContext(), Detail_Resep::class.java)
-                intent.putExtra("Extra_Food", food)
-                startActivity(intent)
-            },
+        lifecycleScope.launch {
+            val foodList = db.foodDao()
+                .getAllFoods()
+                .map { it.toFood() }
 
-            // Klik komentar → buka Detail_Resep scroll ke komentar
-            onKomentarClick = { food ->
-                val intent = Intent(requireContext(), Detail_Resep::class.java)
-                intent.putExtra("Extra_Food", food)
-                intent.putExtra("SCROLL_TO_KOMENTAR", true)
-                startActivity(intent)
-            },
+            adapter = FoodAdapter(
+                foodList = foodList,
 
-            // Klik simpan → sudah dihandle di adapter (toggle + update angka)
-            onSimpanClick = { _ -> },
+                // Klik card → buka Detail_Resep
+                onItemClick = { food ->
+                    val intent = Intent(requireContext(), Detail_Resep::class.java)
+                    intent.putExtra("Extra_Food", food)
+                    startActivity(intent)
+                },
 
-            // Klik share → buka Android share sheet
-            onShareClick = { food ->
-                val shareText = "Cek resep ${food.title} di EuroCuisine!\n\n${food.desc}"
-                val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, shareText)
+                // Klik komentar → buka Detail_Resep scroll ke komentar
+                onKomentarClick = { food ->
+                    val intent = Intent(requireContext(), Detail_Resep::class.java)
+                    intent.putExtra("Extra_Food", food)
+                    intent.putExtra("SCROLL_TO_KOMENTAR", true)
+                    startActivity(intent)
+                },
+
+                // Klik simpan → sudah dihandle di adapter (toggle + update angka)
+                onSimpanClick = { food ->
+                    lifecycleScope.launch {
+                        val newFavorite = !food.isFavorite
+
+                        db.foodDao().updateFavorite(food.id, newFavorite)
+
+                        val updatedList = db.foodDao()
+                            .getAllFoods()
+                            .map { it.toFood() }
+
+                        adapter.updateData(updatedList)
+                    }
+                },
+
+                // Klik share → buka Android share sheet
+                onShareClick = { food ->
+                    val shareText = "Cek resep ${food.title} di EuroCuisine!\n\n${food.desc}"
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, shareText)
+                    }
+                    startActivity(Intent.createChooser(shareIntent, "Bagikan resep via..."))
                 }
-                startActivity(Intent.createChooser(shareIntent, "Bagikan resep via..."))
-            }
-        )
+            )
 
-        recyclerFood.adapter = adapter
+            recyclerFood.adapter = adapter
+        }
     }
 
     // Refresh angka & status bookmark saat kembali ke Home
     override fun onResume() {
         super.onResume()
-        adapter.notifyDataSetChanged()
+
+        if (::adapter.isInitialized){
+            adapter.notifyDataSetChanged()
+        }
     }
 }
