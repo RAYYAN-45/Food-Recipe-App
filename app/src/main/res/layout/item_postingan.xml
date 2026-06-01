@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- item_postingan.xml -->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardPostingan"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    card:cardCornerRadius="16dp"
+    card:cardElevation="0dp"
+    card:cardBackgroundColor="#FCF2E4"
+    card:cardUseCompatPadding="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_food_border">
+
+        <!-- BAGIAN ATAS: FOTO PROFIL + USERNAME + JUDUL + DESC -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <!-- BARIS ATAS: FOTO PROFIL + USERNAME -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <!-- FOTO PROFIL (LINGKARAN) -->
+                <ImageView
+                    android:id="@+id/imgProfilPostingan"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/bg_image_circle"
+                    android:clipToOutline="true"
+                    android:src="@drawable/ic_star_border"/>
+
+                <!-- USERNAME -->
+                <TextView
+                    android:id="@+id/txtNamaUserPostingan"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="nama_user"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#000000"
+                    android:layout_marginStart="12dp"/>
+
+            </LinearLayout>
+
+            <!-- JUDUL RESEP -->
+            <TextView
+                android:id="@+id/txtJudulResepPostingan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Judul Resep"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#3A3A3A"
+                android:layout_marginBottom="4dp"/>
+
+            <!-- DESKRIPSI -->
+            <TextView
+                android:id="@+id/txtDeskripsiPostingan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Deskripsi postingan..."
+                android:textSize="12sp"
+                android:textColor="#7A7A7A"
+                android:lineSpacingExtra="3dp"
+                android:maxLines="3"
+                android:ellipsize="end"/>
+
+        </LinearLayout>
+
+        <!-- DIVIDER -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000000"/>
+
+        <!-- BARIS BAWAH: IKON KOMENTAR | SIMPAN | SHARE -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- KOMENTAR -->
+            <LinearLayout
+                android:id="@+id/layoutKomentarPostingan"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/speechbubble"
+                    android:scaleType="fitCenter"/>
+
+                <TextView
+                    android:id="@+id/txtJumlahKomenPostingan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="13sp"
+                    android:textColor="#7A7A7A"
+                    android:layout_marginStart="5dp"/>
+
+            </LinearLayout>
+
+            <!-- DIVIDER VERTIKAL -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="20dp"
+                android:background="#000000"/>
+
+            <!-- SIMPAN -->
+            <LinearLayout
+                android:id="@+id/layoutSimpanPostingan"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/imgBookmarkPostingan"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/bookmark"
+                    android:scaleType="fitCenter"/>
+
+                <TextView
+                    android:id="@+id/txtJumlahSimpanPostingan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="13sp"
+                    android:textColor="#7A7A7A"
+                    android:layout_marginStart="5dp"/>
+
+            </LinearLayout>
+
+            <!-- DIVIDER VERTIKAL -->
+            <View
+                android:layout_width="1dp"
+                android:layout_height="20dp"
+                android:background="#000000"/>
+
+            <!-- SHARE -->
+            <LinearLayout
+                android:id="@+id/layoutSharePostingan"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/sent"
+                    android:scaleType="fitCenter"/>
+
+                <TextView
+                    android:id="@+id/txtJumlahSharePostingan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="13sp"
+                    android:textColor="#7A7A7A"
+                    android:layout_marginStart="5dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
