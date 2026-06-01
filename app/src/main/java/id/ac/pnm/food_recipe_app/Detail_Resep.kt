@@ -65,8 +65,8 @@ class Detail_Resep : AppCompatActivity() {
         txtEmptyKomen = findViewById(R.id.txtEmptyKomen)
 
         // ===== KODE LAMA: setup RecyclerView =====
-        rvBahan.layoutManager   = LinearLayoutManager(this)
-        rvLangkah.layoutManager = LinearLayoutManager(this)
+        rvBahan.layoutManager    = LinearLayoutManager(this)
+        rvLangkah.layoutManager  = LinearLayoutManager(this)
         rvKomentar.layoutManager = LinearLayoutManager(this)
 
         // ===== KODE LAMA: ambil data food dari Intent =====
@@ -76,49 +76,50 @@ class Detail_Resep : AppCompatActivity() {
 
             foodId = food.id
 
-            // Set judul di action bar
             supportActionBar?.title = food.title
-
-            // Set gambar header
             imgHeader.setImageResource(food.image)
-
-            // Set judul utama
             txtJudul.text = food.title
 
-            // Tampilkan data bahan dan langkah
             rvBahan.adapter   = TextAdapter(food.ingredients)
             rvLangkah.adapter = TextAdapter(food.steps)
 
-            // ===== KOMENTAR: ambil REFERENSI LIST dari FoodDataSource =====
-            // Karena ini referensi (bukan copy), data tidak akan hilang
-            // walaupun Activity di-recreate / pindah menu
+            // ===== KOMENTAR =====
             val listKomentar = FoodDataSource.getKomentar(food.id)
             komentarAdapter = KomentarAdapter(listKomentar)
             rvKomentar.adapter = komentarAdapter
             updateEmptyState()
 
-            // ===== KODE LAMA: tombol back =====
+            // ===== TOMBOL BACK =====
             btnBack.setOnClickListener { finish() }
 
-            // ===== KODE LAMA: tombol share =====
-            btnShare.setOnClickListener { shareImage(food) }
+            // ===== TOMBOL SHARE =====
+            // Tambah update angka share di FoodDataSource
+            btnShare.setOnClickListener {
+                FoodDataSource.tambahShare(food.id) // ← update angka share
+                shareImage(food)
+            }
 
-            // ===== KODE LAMA: tombol favorit =====
-
+            // ===== TOMBOL FAVORIT =====
             val db = FoodDatabase.getDatabase(this)
-
             var isFavorite = food.isFavorite
             setFavoriteIcon(isFavorite)
 
             btnFavorite.setOnClickListener {
                 isFavorite = !isFavorite
+
+                // Update angka simpan di FoodDataSource
+                if (isFavorite) {
+                    FoodDataSource.tambahSimpan(food.id)
+                } else {
+                    FoodDataSource.kurangiSimpan(food.id)
+                }
+
+                // Update Room
                 lifecycleScope.launch {
                     db.foodDao().updateFavorite(food.id, isFavorite)
-
                     runOnUiThread {
                         setFavoriteIcon(isFavorite)
-
-                        if(isFavorite){
+                        if (isFavorite) {
                             Toast.makeText(this@Detail_Resep, "Tersimpan di Favorit", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(this@Detail_Resep, "Dihapus Dari Favorit", Toast.LENGTH_SHORT).show()
@@ -143,8 +144,6 @@ class Detail_Resep : AppCompatActivity() {
         }
     }
 
-    // Dipanggil setiap kali Activity kembali ke foreground
-    // Supaya komentar selalu up-to-date
     override fun onResume() {
         super.onResume()
         if (foodId != -1) {
@@ -165,18 +164,14 @@ class Detail_Resep : AppCompatActivity() {
         val waktu = SimpleDateFormat("HH:mm dd/MM/yyyy", Locale.getDefault()).format(Date())
 
         val komentar = Komentar(
-            nama  = "Saya",  // nanti ganti nama user dari login
+            nama  = "Saya",
             isi   = isiKomen,
             waktu = waktu
         )
 
-        // Simpan ke FoodDataSource — data tersimpan global selama app hidup
         FoodDataSource.tambahKomentar(foodId, komentar)
-
-        // Refresh adapter
         komentarAdapter.notifyItemInserted(0)
         rvKomentar.scrollToPosition(0)
-
         editKomentar.setText("")
         updateEmptyState()
 
@@ -191,18 +186,16 @@ class Detail_Resep : AppCompatActivity() {
         }
     }
 
-    // ===== KODE LAMA: icon favorit =====
+    // ===== ICON FAVORIT =====
     private fun setFavoriteIcon(isFav: Boolean) {
         if (isFav) {
-            // Sudah disimpan → bookmark putih SOLID/PENUH
             btnFavorite.setImageResource(R.drawable.bookmark_white_filled)
         } else {
-            // Belum disimpan → bookmark_1 (drawable yang sudah ada di project)
             btnFavorite.setImageResource(R.drawable.bookmark_1)
         }
     }
 
-    // ===== KODE LAMA: share image =====
+    // ===== SHARE IMAGE =====
     private fun shareImage(food: Food) {
         try {
             val bitmap = Bitmap.createBitmap(
