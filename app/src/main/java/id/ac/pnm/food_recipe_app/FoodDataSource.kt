@@ -2,19 +2,54 @@ package id.ac.pnm.food_recipe_app
 
 object FoodDataSource {
 
-    // Set untuk nyimpan ID makanan yang difavoritkan
-    private val favoriteIds = mutableSetOf<Int>()
-
-    // Map untuk nyimpan jumlah komentar, simpan, share per food id
-    private val jumlahKomenMap  = mutableMapOf<Int, Int>()
+    // Map untuk nyimpan jumlah simpan dan share per food id
+    // Komentar dihitung dari komentarMap langsung
     private val jumlahSimpanMap = mutableMapOf<Int, Int>()
     private val jumlahShareMap  = mutableMapOf<Int, Int>()
 
-    // ===== TAMBAHAN: simpan list komentar per food id =====
-    // Key = food.id, Value = list komentar untuk food tersebut
+    // Simpan list komentar per food id
     private val komentarMap = mutableMapOf<Int, MutableList<Komentar>>()
 
-    // Fungsi untuk dapat semua makanan
+    // ===================== FAVORIT (Room yang handle, ini hanya angka) =====================
+
+    fun tambahSimpan(foodId: Int) {
+        jumlahSimpanMap[foodId] = (jumlahSimpanMap[foodId] ?: 0) + 1
+    }
+
+    fun kurangiSimpan(foodId: Int) {
+        jumlahSimpanMap[foodId] = maxOf(0, (jumlahSimpanMap[foodId] ?: 0) - 1)
+    }
+
+    fun getJumlahSimpan(foodId: Int): Int = jumlahSimpanMap[foodId] ?: 0
+
+    // ===================== SHARE =====================
+
+    fun tambahShare(foodId: Int) {
+        jumlahShareMap[foodId] = (jumlahShareMap[foodId] ?: 0) + 1
+    }
+
+    fun getJumlahShare(foodId: Int): Int = jumlahShareMap[foodId] ?: 0
+
+    // ===================== KOMENTAR =====================
+
+    fun getKomentar(foodId: Int): MutableList<Komentar> {
+        if (!komentarMap.containsKey(foodId)) {
+            komentarMap[foodId] = mutableListOf()
+        }
+        return komentarMap[foodId]!!
+    }
+
+    fun tambahKomentar(foodId: Int, komentar: Komentar) {
+        if (!komentarMap.containsKey(foodId)) {
+            komentarMap[foodId] = mutableListOf()
+        }
+        komentarMap[foodId]!!.add(0, komentar)
+    }
+
+    fun getJumlahKomenAktual(foodId: Int): Int = komentarMap[foodId]?.size ?: 0
+
+    // ===================== DATA RESEP (fallback jika Room belum siap) =====================
+
     fun getAllFoods(): List<Food> {
         return listOf(
             Food(
@@ -48,15 +83,9 @@ object FoodDataSource {
                 desc = "Hidangan khas Spanyol dengan nasi saffron dicampur makanan laut...",
                 image = R.drawable.paella,
                 ingredients = listOf(
-                    "300 gr beras",
-                    "200 gr udang",
-                    "150 gr kerang",
-                    "100 gr cumi",
-                    "1 paprika merah",
-                    "1 tomat",
-                    "Saffron",
-                    "Kaldu ayam 500 ml",
-                    "Minyak zaitun"
+                    "300 gr beras", "200 gr udang", "150 gr kerang",
+                    "100 gr cumi", "1 paprika merah", "1 tomat",
+                    "Saffron", "Kaldu ayam 500 ml", "Minyak zaitun"
                 ),
                 steps = listOf(
                     "Panaskan minyak zaitun dalam wajan paella",
@@ -96,55 +125,7 @@ object FoodDataSource {
         )
     }
 
-    // ===================== FAVORIT =====================
-
-    fun toggleFavorite(foodId: Int) {
-        if (favoriteIds.contains(foodId)) {
-            favoriteIds.remove(foodId)
-            jumlahSimpanMap[foodId] = maxOf(0, (jumlahSimpanMap[foodId] ?: 0) - 1)
-        } else {
-            favoriteIds.add(foodId)
-            jumlahSimpanMap[foodId] = (jumlahSimpanMap[foodId] ?: 0) + 1
-        }
-    }
-
-    fun isFavorite(foodId: Int): Boolean = favoriteIds.contains(foodId)
-
-    fun getFavoriteFoods(): List<Food> {
-        return getAllFoods().filter { food -> favoriteIds.contains(food.id) }
-    }
-
-    // ===================== JUMLAH =====================
-
-    fun getJumlahKomen(foodId: Int): Int  = jumlahKomenMap[foodId] ?: 0
-    fun getJumlahSimpan(foodId: Int): Int = jumlahSimpanMap[foodId] ?: 0
-    fun getJumlahShare(foodId: Int): Int  = jumlahShareMap[foodId] ?: 0
-
-    fun tambahShare(foodId: Int) {
-        jumlahShareMap[foodId] = (jumlahShareMap[foodId] ?: 0) + 1
-    }
-
-    // ===================== KOMENTAR =====================
-
-    // Ambil list komentar untuk food tertentu
-    // Kalau belum ada, buat list kosong dulu
-    fun getKomentar(foodId: Int): MutableList<Komentar> {
-        if (!komentarMap.containsKey(foodId)) {
-            komentarMap[foodId] = mutableListOf()
-        }
-        return komentarMap[foodId]!!
-    }
-
-    // Tambah komentar baru untuk food tertentu
-    fun tambahKomentar(foodId: Int, komentar: Komentar) {
-        if (!komentarMap.containsKey(foodId)) {
-            komentarMap[foodId] = mutableListOf()
-        }
-        komentarMap[foodId]!!.add(0, komentar) // tambah di paling atas
-        // update jumlah komentar
-        jumlahKomenMap[foodId] = komentarMap[foodId]!!.size
-    }
-
-    // Ambil jumlah komentar aktual dari list
-    fun getJumlahKomenAktual(foodId: Int): Int = komentarMap[foodId]?.size ?: 0
+    // Fungsi ini dipakai FavoritFragment kalau belum pakai Room
+    fun isFavorite(foodId: Int): Boolean = false // Room yang handle
+    fun getFavoriteFoods(): List<Food> = emptyList() // Room yang handle
 }
