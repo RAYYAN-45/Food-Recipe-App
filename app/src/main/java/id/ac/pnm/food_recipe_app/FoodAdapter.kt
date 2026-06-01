@@ -18,16 +18,16 @@ class FoodAdapter(
 ) : RecyclerView.Adapter<FoodAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imgFood: ImageView = itemView.findViewById(R.id.imgFood)
-        val txtTitle: TextView = itemView.findViewById(R.id.txtTitle)
-        val txtDesc: TextView = itemView.findViewById(R.id.txtDesc)
-        val txtJumlahKomen: TextView = itemView.findViewById(R.id.txtJumlahKomen)
-        val txtJumlahSimpan: TextView = itemView.findViewById(R.id.txtJumlahSimpan)
-        val txtJumlahShare: TextView = itemView.findViewById(R.id.txtJumlahShare)
-        val imgBookmark: ImageView = itemView.findViewById(R.id.imgBookmark)
+        val imgFood: ImageView           = itemView.findViewById(R.id.imgFood)
+        val txtTitle: TextView           = itemView.findViewById(R.id.txtTitle)
+        val txtDesc: TextView            = itemView.findViewById(R.id.txtDesc)
+        val txtJumlahKomen: TextView     = itemView.findViewById(R.id.txtJumlahKomen)
+        val txtJumlahSimpan: TextView    = itemView.findViewById(R.id.txtJumlahSimpan)
+        val txtJumlahShare: TextView     = itemView.findViewById(R.id.txtJumlahShare)
+        val imgBookmark: ImageView       = itemView.findViewById(R.id.imgBookmark)
         val layoutKomentar: LinearLayout = itemView.findViewById(R.id.layoutKomentar)
-        val layoutSimpan: LinearLayout = itemView.findViewById(R.id.layoutSimpan)
-        val layoutShare: LinearLayout = itemView.findViewById(R.id.layoutShare)
+        val layoutSimpan: LinearLayout   = itemView.findViewById(R.id.layoutSimpan)
+        val layoutShare: LinearLayout    = itemView.findViewById(R.id.layoutShare)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -39,17 +39,17 @@ class FoodAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val food = foodList[position]
 
-        // Tampilkan data
+        // Tampilkan data resep
         holder.txtTitle.text = food.title
-        holder.txtDesc.text = food.desc
+        holder.txtDesc.text  = food.desc
         holder.imgFood.setImageResource(food.image)
 
-        // Tampilkan angka dari FoodDataSource (global/shared)
-        holder.txtJumlahKomen.text = FoodDataSource.getJumlahKomenAktual(food.id).toString()
-        holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
-        holder.txtJumlahShare.text = FoodDataSource.getJumlahShare(food.id).toString()
+        // Angka komentar & share dari FoodDataSource (Map global)
+        holder.txtJumlahKomen.text  = FoodDataSource.getJumlahKomenAktual(food.id).toString()
+        holder.txtJumlahShare.text  = FoodDataSource.getJumlahShare(food.id).toString()
 
-        // Tampilkan status bookmark dari FoodDataSource (sinkron semua fragment)
+        // Angka simpan & status bookmark dari field isFavorite Room
+        holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
         updateBookmarkIcon(holder.imgBookmark, food.isFavorite)
 
         // Klik card → buka Detail
@@ -57,18 +57,32 @@ class FoodAdapter(
             onItemClick(food)
         }
 
-        // LISTENER 1: Komentar → buka detail resep, angka diambil dari jumlah komentar aktual
+        // LISTENER 1: Komentar → update angka langsung + buka detail
         holder.layoutKomentar.setOnClickListener {
+            // angka komentar naik (dari jumlah aktual di FoodDataSource)
             holder.txtJumlahKomen.text = FoodDataSource.getJumlahKomenAktual(food.id).toString()
             onKomentarClick(food)
         }
 
-        // LISTENER 2: Simpan → toggle bookmark + update angka + ikon
+        // LISTENER 2: Simpan → toggle bookmark + update angka
+        // Status simpan dihandle Room lewat callback onSimpanClick
         holder.layoutSimpan.setOnClickListener {
+            // Update angka simpan di FoodDataSource
+            if (food.isFavorite) {
+                FoodDataSource.kurangiSimpan(food.id)
+            } else {
+                FoodDataSource.tambahSimpan(food.id)
+            }
+            holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
+
+            // Toggle ikon sementara (sebelum Room update)
+            updateBookmarkIcon(holder.imgBookmark, !food.isFavorite)
+
+            // Callback ke Home_Fragment untuk update Room
             onSimpanClick(food)
         }
 
-        // LISTENER 3: Share → tambah angka + callback
+        // LISTENER 3: Share → tambah angka + buka share sheet
         holder.layoutShare.setOnClickListener {
             FoodDataSource.tambahShare(food.id)
             holder.txtJumlahShare.text = FoodDataSource.getJumlahShare(food.id).toString()
@@ -83,8 +97,8 @@ class FoodAdapter(
         notifyDataSetChanged()
     }
 
-    // Belum disimpan → @drawable/bookmark (outline, warna asli)
-    // Sudah disimpan → @drawable/bookmark_filled (solid hitam penuh)
+    // Belum disimpan → bookmark outline
+    // Sudah disimpan → bookmark_filled hitam penuh
     private fun updateBookmarkIcon(imgBookmark: ImageView, isBookmarked: Boolean) {
         if (isBookmarked) {
             imgBookmark.setImageResource(R.drawable.bookmark_filled)
