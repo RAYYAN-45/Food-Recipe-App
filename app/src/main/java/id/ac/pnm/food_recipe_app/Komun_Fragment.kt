@@ -1,5 +1,6 @@
 package id.ac.pnm.food_recipe_app
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -89,17 +90,24 @@ class Komun_Fragment : Fragment() {
         // Adapter tab Semua
         adapterSemua = PostinganAdapter(
             list = PostinganDataSource.getAllPostingan().toMutableList(),
+
             onItemClick = { postingan ->
-                // Anam yang handle detail postingan
-                Toast.makeText(requireContext(), postingan.judulResep, Toast.LENGTH_SHORT).show()
+                val intent = Intent(requireContext(), DetailUserActivity::class.java)
+
+                intent.putExtra("POSTINGAN_ID", postingan.id)
+
+                startActivity(intent)
             },
+
             onSimpanChanged = {
                 // Refresh tab Tersimpan setiap kali ada perubahan simpan
                 if (tabAktif == "tersimpan") {
                     adapterTersimpan.updateData(
                         PostinganDataSource.getSavedPostingan().toMutableList()
                     )
-                    updateEmptyState(PostinganDataSource.getSavedPostingan().isEmpty())
+                    updateEmptyState(
+                        PostinganDataSource.getSavedPostingan().isEmpty()
+                    )
                 }
             }
         )
