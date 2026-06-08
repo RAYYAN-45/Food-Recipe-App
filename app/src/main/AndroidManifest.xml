@@ -11,11 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_eurocuisine_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Food_Recipe_App">
-
+        <activity
+            android:name=".ProfileUserActivity"
+            android:exported="false" />
         <activity
             android:name=".DetailPostinganActivity"
             android:exported="false" />
-
         <activity
             android:name=".RegisterActivity"
             android:exported="false" />

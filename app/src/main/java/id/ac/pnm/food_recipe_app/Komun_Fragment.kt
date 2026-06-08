@@ -92,7 +92,7 @@ class Komun_Fragment : Fragment() {
             list = PostinganDataSource.getAllPostingan().toMutableList(),
 
             onItemClick = { postingan ->
-                val intent = Intent(requireContext(), DetailUserActivity::class.java)
+                val intent = Intent(requireContext(), ProfileUserActivity::class.java)
 
                 intent.putExtra("POSTINGAN_ID", postingan.id)
 
