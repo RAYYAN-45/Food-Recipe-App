@@ -11,13 +11,14 @@ import androidx.recyclerview.widget.RecyclerView
 
 class PostinganAdapter(
     private var list: MutableList<Postingan>,
+    private var savedIds: Set<String>,
     private val onItemClick: (Postingan) -> Unit,
-    private val onSimpanChanged: (() -> Unit)? = null
+    private val onBookmarkClick: (Postingan) -> Unit
 ) : RecyclerView.Adapter<PostinganAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imgProfil: ImageView         = itemView.findViewById(R.id.imgProfilPostingan)
-        val txtNamaUser: TextView        = itemView.findViewById(R.id.txtNamaUserPostingan)
+        val imgProfil: ImageView = itemView.findViewById(R.id.imgProfilPostingan)
+        val txtNamaUser: TextView = itemView.findViewById(R.id.txtNamaUserPostingan)
         val txtJudul: TextView           = itemView.findViewById(R.id.txtJudulResepPostingan)
         val txtDeskripsi: TextView       = itemView.findViewById(R.id.txtDeskripsiPostingan)
         val txtJumlahKomen: TextView     = itemView.findViewById(R.id.txtJumlahKomenPostingan)
@@ -26,7 +27,7 @@ class PostinganAdapter(
         val imgBookmark: ImageView       = itemView.findViewById(R.id.imgBookmarkPostingan)
         val layoutKomentar: LinearLayout = itemView.findViewById(R.id.layoutKomentarPostingan)
         val layoutSimpan: LinearLayout   = itemView.findViewById(R.id.layoutSimpanPostingan)
-        val layoutShare: LinearLayout    = itemView.findViewById(R.id.layoutSharePostingan)
+        val layoutShare: LinearLayout = itemView.findViewById(R.id.layoutSharePostingan)
         val cardPostingan: View          = itemView.findViewById(R.id.cardPostingan)
     }
 
@@ -47,40 +48,27 @@ class PostinganAdapter(
         holder.txtJumlahSimpan.text = postingan.jumlahSimpan.toString()
         holder.txtJumlahShare.text  = postingan.jumlahShare.toString()
 
-        updateBookmarkIcon(holder.imgBookmark, PostinganDataSource.isSaved(postingan.id))
+        // Cek disimpan atau tidak
+        val isSaved = savedIds.contains(postingan.postId)
+        updateBookmarkIcon(holder.imgBookmark, isSaved)
 
-        // Klik card → buka detail
         holder.cardPostingan.setOnClickListener { onItemClick(postingan) }
 
-        // LISTENER 1: Komentar → tambah angka + buka DetailPostinganActivity
+        //  Komentar
         holder.layoutKomentar.setOnClickListener {
             postingan.jumlahKomen++
             holder.txtJumlahKomen.text = postingan.jumlahKomen.toString()
-
-            // Buka halaman detail postingan (Anam yang lengkapi)
             val intent = Intent(holder.itemView.context, DetailPostinganActivity::class.java)
             intent.putExtra("Extra_Postingan", postingan)
             holder.itemView.context.startActivity(intent)
         }
 
-        // LISTENER 2: Simpan → toggle + update angka + ikon + refresh tab Tersimpan
+        //  Simpan
         holder.layoutSimpan.setOnClickListener {
-            val wasSaved = PostinganDataSource.isSaved(postingan.id)
-            PostinganDataSource.toggleSaved(postingan.id)
-            val isNowSaved = PostinganDataSource.isSaved(postingan.id)
-
-            if (isNowSaved) {
-                postingan.jumlahSimpan++
-            } else {
-                postingan.jumlahSimpan = maxOf(0, postingan.jumlahSimpan - 1)
-            }
-
-            holder.txtJumlahSimpan.text = postingan.jumlahSimpan.toString()
-            updateBookmarkIcon(holder.imgBookmark, isNowSaved)
-            onSimpanChanged?.invoke()
+            onBookmarkClick(postingan)
         }
 
-        // LISTENER 3: Share → tambah angka + buka share sheet
+        //  Share
         holder.layoutShare.setOnClickListener {
             postingan.jumlahShare++
             holder.txtJumlahShare.text = postingan.jumlahShare.toString()
@@ -90,16 +78,16 @@ class PostinganAdapter(
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, shareText)
             }
-            holder.itemView.context.startActivity(
-                Intent.createChooser(shareIntent, "Bagikan via...")
-            )
+            holder.itemView.context.startActivity(Intent.createChooser(shareIntent, "Bagikan via..."))
         }
     }
 
     override fun getItemCount(): Int = list.size
 
-    fun updateData(newList: List<Postingan>) {
+    // Fungsi untuk update data resep dan data bookmark sekaligus
+    fun updateData(newList: List<Postingan>, newSavedIds: Set<String>) {
         list = newList.toMutableList()
+        savedIds = newSavedIds
         notifyDataSetChanged()
     }
 

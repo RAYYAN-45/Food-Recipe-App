@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Food_Recipe_App">
         <activity
+            android:name=".TambahResepActivity"
+            android:exported="false" />
+        <activity
             android:name=".ProfileUserActivity"
             android:exported="false" />
         <activity

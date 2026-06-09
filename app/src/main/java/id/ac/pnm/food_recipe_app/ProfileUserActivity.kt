@@ -9,6 +9,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class ProfileUserActivity : AppCompatActivity() {
+
+    private lateinit var imgProfile: ImageView
+    private lateinit var txtNamaUser: TextView
+    private lateinit var btnBack: ImageView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -18,15 +23,6 @@ class ProfileUserActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-    }
-
-    private lateinit var imgProfile: ImageView
-    private lateinit var txtNamaUser: TextView
-    private lateinit var btnBack: ImageView
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user_profile)
 
         imgProfile = findViewById(R.id.imgProfile)
         txtNamaUser = findViewById(R.id.txtNamaUser)
@@ -44,5 +40,6 @@ class ProfileUserActivity : AppCompatActivity() {
         btnBack.setOnClickListener {
             finish()
         }
+
     }
 }

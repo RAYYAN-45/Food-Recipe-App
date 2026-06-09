@@ -3,16 +3,17 @@ package id.ac.pnm.food_recipe_app
 import java.io.Serializable
 
 data class Postingan(
-    val id: Int,
-    val namaUser: String,
-    val fotoProfilUser: Int,
-    val judulResep: String,
-    val deskripsi: String,
+    var postId: String = "",
+    var userId: String = "",
+    var namaUser: String = "",
+    var judulResep: String = "",
+    var deskripsi: String = "",
+    var bahan: String = "",
+    var langkah: String = "",
+    var timestamp: Long = 0L,
 
-//    val bahan: String,
-//    val langkah: String,
-
+    var fotoProfilUser: Int = 0,
     var jumlahKomen: Int = 0,
     var jumlahSimpan: Int = 0,
-    var jumlahShare: Int = 0
+    var jumlahShare: Int = 0,
 ) : Serializable

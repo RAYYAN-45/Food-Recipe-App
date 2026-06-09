@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAF0E6"
+    android:fillViewport="true"> <!-- Warna background cream sesuai desain -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- HEADER -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp">
+
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/bg_button"
+                android:src="@drawable/arrow"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Tambah Postingan"
+                android:textColor="#B5653D"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+        <!-- NAMA MENU -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nama Menu"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etNamaMenu"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:paddingHorizontal="12dp"
+            android:inputType="textCapWords"
+            android:textColor="@color/black"
+            android:background="@drawable/bg_input_stroke"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- DESKRIPSI MENU -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Deskripsi Menu"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etDeskripsi"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:gravity="top|start"
+            android:padding="12dp"
+            android:background="@drawable/bg_input_stroke"
+            android:inputType="textMultiLine"
+            android:textColor="@color/black"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- BAHAN - BAHAN -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bahan - Bahan"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etBahan"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:gravity="top|start"
+            android:padding="12dp"
+            android:background="@drawable/bg_input_stroke"
+            android:textColor="@color/black"
+            android:inputType="textMultiLine"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- LANGKAH - LANGKAH -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Langkah - Langkah"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/etLangkah"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:gravity="top|start"
+            android:padding="12dp"
+            android:background="@drawable/bg_input_stroke"
+            android:textColor="@color/black"
+            android:inputType="textMultiLine"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- BUTTON SIMPAN -->
+        <Button
+            android:id="@+id/btnSimpanPostingan"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Posting Resep"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#B5653D" />
+
+    </LinearLayout>
+</ScrollView>
