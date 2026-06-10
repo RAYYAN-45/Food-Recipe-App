@@ -8,12 +8,16 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 
 class PostinganAdapter(
     private var list: MutableList<Postingan>,
     private var savedIds: Set<String>,
     private val onItemClick: (Postingan) -> Unit,
-    private val onBookmarkClick: (Postingan) -> Unit
+    private val onBookmarkClick: (Postingan) -> Unit,
+    private val onDeleteClick: ((Postingan) -> Unit)? = null
 ) : RecyclerView.Adapter<PostinganAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -27,8 +31,8 @@ class PostinganAdapter(
         val imgBookmark: ImageView       = itemView.findViewById(R.id.imgBookmarkPostingan)
         val layoutKomentar: LinearLayout = itemView.findViewById(R.id.layoutKomentarPostingan)
         val layoutSimpan: LinearLayout   = itemView.findViewById(R.id.layoutSimpanPostingan)
-        val layoutShare: LinearLayout = itemView.findViewById(R.id.layoutSharePostingan)
         val cardPostingan: View          = itemView.findViewById(R.id.cardPostingan)
+        val btnHapus: ImageView = itemView.findViewById(R.id.btnHapusPostingan)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -44,20 +48,37 @@ class PostinganAdapter(
         holder.txtNamaUser.text     = postingan.namaUser
         holder.txtJudul.text        = postingan.judulResep
         holder.txtDeskripsi.text    = postingan.deskripsi
-        holder.txtJumlahKomen.text  = postingan.jumlahKomen.toString()
-        holder.txtJumlahSimpan.text = postingan.jumlahSimpan.toString()
-        holder.txtJumlahShare.text  = postingan.jumlahShare.toString()
 
+        val postRef = com.google.firebase.database.FirebaseDatabase.getInstance()
+            .getReference("postingan").child(postingan.postId)
+
+        postRef.addValueEventListener(object : com.google.firebase.database.ValueEventListener{
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                holder.txtJumlahKomen.text = snapshot.child("jumlahKomen").getValue(Int::class.java)?.toString() ?: "0"
+                holder.txtJumlahShare.text = snapshot.child("jumlahShare").getValue(Int::class.java)?.toString() ?: "0"
+                holder.txtJumlahSimpan.text = snapshot.child("jumlahSimpan").getValue(Int::class.java)?.toString() ?: "0"
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+
+        })
         // Cek disimpan atau tidak
         val isSaved = savedIds.contains(postingan.postId)
         updateBookmarkIcon(holder.imgBookmark, isSaved)
+
+        // Button Hapus Khusus milik sendiri
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        if (postingan.userId == currentUserId && onDeleteClick != null){
+            holder.btnHapus.visibility = View.VISIBLE
+            holder.btnHapus.setOnClickListener { onDeleteClick.invoke(postingan) }
+        } else {
+            holder.btnHapus.visibility = View.GONE
+        }
 
         holder.cardPostingan.setOnClickListener { onItemClick(postingan) }
 
         //  Komentar
         holder.layoutKomentar.setOnClickListener {
-            postingan.jumlahKomen++
-            holder.txtJumlahKomen.text = postingan.jumlahKomen.toString()
             val intent = Intent(holder.itemView.context, DetailPostinganActivity::class.java)
             intent.putExtra("Extra_Postingan", postingan)
             holder.itemView.context.startActivity(intent)
@@ -68,18 +89,6 @@ class PostinganAdapter(
             onBookmarkClick(postingan)
         }
 
-        //  Share
-        holder.layoutShare.setOnClickListener {
-            postingan.jumlahShare++
-            holder.txtJumlahShare.text = postingan.jumlahShare.toString()
-
-            val shareText = "${postingan.namaUser}: ${postingan.judulResep}\n\n${postingan.deskripsi}"
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "text/plain"
-                putExtra(Intent.EXTRA_TEXT, shareText)
-            }
-            holder.itemView.context.startActivity(Intent.createChooser(shareIntent, "Bagikan via..."))
-        }
     }
 
     override fun getItemCount(): Int = list.size

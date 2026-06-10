@@ -5,10 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import id.ac.pnm.food_recipe_app.data.local.database.FoodDatabase
 import id.ac.pnm.food_recipe_app.data.local.toFood
 import kotlinx.coroutines.launch
@@ -17,6 +20,7 @@ class Home_Fragment : Fragment() {
 
     private lateinit var adapter: FoodAdapter
     private lateinit var recyclerFood: RecyclerView
+    private var listFavoritId = mutableSetOf<Int>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,6 +36,7 @@ class Home_Fragment : Fragment() {
         recyclerFood.layoutManager = LinearLayoutManager(requireContext())
 
         loadData()
+        tarikDataFavoritFirebase()
     }
 
     private fun loadData() {
@@ -44,11 +49,12 @@ class Home_Fragment : Fragment() {
 
             if (::adapter.isInitialized) {
                 // Sudah ada adapter → update data saja supaya isFavorite ter-refresh
-                adapter.updateData(foodList)
+                adapter.updateData(foodList, listFavoritId)
             } else {
                 // Pertama kali → buat adapter baru
                 adapter = FoodAdapter(
                     foodList = foodList,
+                    savedIds = listFavoritId,
 
                     // Klik card → buka Detail_Resep
                     onItemClick = { food ->
@@ -66,25 +72,28 @@ class Home_Fragment : Fragment() {
                     },
 
                     // Klik simpan → update Room + refresh list
-                    onSimpanClick = { food ->
-                        lifecycleScope.launch {
-                            val newFavorite = !food.isFavorite
-                            db.foodDao().updateFavorite(food.id, newFavorite)
-                            val updatedList = db.foodDao()
-                                .getAllFoods()
-                                .map { it.toFood() }
-                            adapter.updateData(updatedList)
+                    onSimpanClick = { food, isCurrentlySaved ->
+                        val currentUser = FirebaseAuth.getInstance().currentUser
+                        if (currentUser == null) {
+                            Toast.makeText(requireContext(), "Harap login", Toast.LENGTH_SHORT).show()
+                            return@FoodAdapter
                         }
-                    },
 
-                    // Klik share → buka Android share sheet
-                    onShareClick = { food ->
-                        val shareText = "Cek resep ${food.title} di EuroCuisine!\n\n${food.desc}"
-                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, shareText)
+                        val refFavoritUser = FirebaseDatabase.getInstance().getReference("favorit_lokal")
+                            .child(currentUser.uid).child(food.id.toString())
+
+                        val refMetaSimpan = FirebaseDatabase.getInstance().getReference("meta_resep_lokal")
+                            .child(food.id.toString()).child("jumlahSimpan")
+
+                        if (isCurrentlySaved) {
+                            refFavoritUser.removeValue()
+                            refMetaSimpan.setValue(com.google.firebase.database.ServerValue.increment(-1)) // TAMBAHAN: Kurangi
+                            Toast.makeText(requireContext(), "Dihapus dari Favorit", Toast.LENGTH_SHORT).show()
+                        } else {
+                            refFavoritUser.setValue(true)
+                            refMetaSimpan.setValue(com.google.firebase.database.ServerValue.increment(1)) // TAMBAHAN: Tambah
+                            Toast.makeText(requireContext(), "Disimpan Ke Favorit", Toast.LENGTH_SHORT).show()
                         }
-                        startActivity(Intent.createChooser(shareIntent, "Bagikan resep via..."))
                     }
                 )
                 recyclerFood.adapter = adapter
@@ -97,5 +106,29 @@ class Home_Fragment : Fragment() {
     override fun onResume() {
         super.onResume()
         loadData()
+    }
+
+    private fun tarikDataFavoritFirebase() {
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
+        val ref = FirebaseDatabase.getInstance().getReference("favorit_lokal").child(currentUser.uid)
+
+        ref.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                listFavoritId.clear()
+                for (data in snapshot.children) {
+                    data.key?.toIntOrNull()?.let { listFavoritId.add(it) }
+                }
+
+                // Segarkan layar setiap kali ada data favorit baru ditarik
+                if (::adapter.isInitialized && isAdded) {
+                    val db = FoodDatabase.getDatabase(requireContext())
+                    lifecycleScope.launch {
+                        val foods = db.foodDao().getAllFoods().map { it.toFood() }
+                        adapter.updateData(foods, listFavoritId)
+                    }
+                }
+            }
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+        })
     }
 }

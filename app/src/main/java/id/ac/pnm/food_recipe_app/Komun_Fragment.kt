@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -51,7 +52,7 @@ class Komun_Fragment : Fragment() {
 
         currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
         dbRefPostingan = FirebaseDatabase.getInstance().getReference("postingan")
-        dbRefFavorit = FirebaseDatabase.getInstance().getReference("favorit").child(currentUserId)
+        dbRefFavorit = FirebaseDatabase.getInstance().getReference("favorit_postingan").child(currentUserId)
 
         setupAdapter()
         initFirebaseListeners()
@@ -81,11 +82,24 @@ class Komun_Fragment : Fragment() {
                 startActivity(intent)
             },
             onBookmarkClick = { postingan ->
-                // Ketika diklik di komunitas, simpan/hapus ID-nya di Firebase node "favorit"
+                val databasePostRef = FirebaseDatabase.getInstance().getReference("postingan").child(postingan.postId)
+
                 if (listFavoritId.contains(postingan.postId)) {
                     dbRefFavorit.child(postingan.postId).removeValue()
+
+                    databasePostRef.child("jumlahSimpan").addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val count = snapshot.getValue(Int::class.java) ?: 0
+                            if (count > 0) databasePostRef.child("jumlahSimpan").setValue(ServerValue.increment(-1))
+                        }
+                        override fun onCancelled(error: DatabaseError) {}
+                    })
+                    Toast.makeText(requireContext(), "Dihapus dari Favorit", Toast.LENGTH_SHORT).show()
                 } else {
                     dbRefFavorit.child(postingan.postId).setValue(true)
+
+                    databasePostRef.child("jumlahSimpan").setValue(ServerValue.increment(1))
+                    Toast.makeText(requireContext(), "Disimpan di Favorit", Toast.LENGTH_SHORT).show()
                 }
             }
         )
