@@ -13,7 +13,8 @@
         android:theme="@style/Theme.Food_Recipe_App">
         <activity
             android:name=".TambahResepActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ProfileUserActivity"
             android:exported="false" />
@@ -22,7 +23,8 @@
             android:exported="false" />
         <activity
             android:name=".RegisterActivity"
-            android:exported="false" />
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".LoginActivity"
             android:exported="false" />

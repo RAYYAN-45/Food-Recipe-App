@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fcf2e4"
-    tools:context=".RegisterActivity">
+    android:fillViewport="true"
+    android:background="#fcf2e4">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="40dp"
+        tools:context=".RegisterActivity">
 
 
     <ImageView
@@ -87,6 +94,8 @@
         android:textColorHint="#9e9e9e"
         android:textColor="@color/black"
         android:background="@drawable/bg_input_stroke"
+        android:imeOptions="actionNext"
+        android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="@+id/editTextTextEmailAddress"
         app:layout_constraintStart_toStartOf="@+id/editTextTextEmailAddress"
         app:layout_constraintTop_toBottomOf="@+id/textViewJudulUsername" />
@@ -116,6 +125,7 @@
         android:textColor="@color/black"
         android:inputType="textPassword"
         android:background="@drawable/bg_input_stroke"
+        android:imeOptions="actionDone"
         app:layout_constraintEnd_toEndOf="@+id/editTextTextEmailAddress"
         app:layout_constraintStart_toStartOf="@+id/editTextTextEmailAddress"
         app:layout_constraintTop_toBottomOf="@+id/textViewJudulPassword" />
@@ -143,4 +153,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/buttonRegister" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
