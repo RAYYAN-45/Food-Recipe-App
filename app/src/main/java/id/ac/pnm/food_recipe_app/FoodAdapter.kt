@@ -8,13 +8,15 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 
 class FoodAdapter(
     private var foodList: List<Food>,
     private val onItemClick: (Food) -> Unit,
     private val onKomentarClick: (Food) -> Unit,
-    private val onSimpanClick: (Food) -> Unit,
-    private val onShareClick: (Food) -> Unit
+    private val onSimpanClick: (Food, Boolean) -> Unit,
+    private var savedIds: Set<Int>
 ) : RecyclerView.Adapter<FoodAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -38,19 +40,41 @@ class FoodAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val food = foodList[position]
+        val isSaved = savedIds.contains(food.id)
 
         // Tampilkan data resep
         holder.txtTitle.text = food.title
         holder.txtDesc.text  = food.desc
         holder.imgFood.setImageResource(food.image)
 
-        // Angka komentar & share dari FoodDataSource (Map global)
-        holder.txtJumlahKomen.text  = FoodDataSource.getJumlahKomenAktual(food.id).toString()
-        holder.txtJumlahShare.text  = FoodDataSource.getJumlahShare(food.id).toString()
+        // Angka komentar & share dari Firebase
+        val dbKomentarRef = com.google.firebase.database.FirebaseDatabase.getInstance()
+            .getReference("komentar").child(food.id.toString())
+
+        dbKomentarRef.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                holder.txtJumlahKomen.text = snapshot.childrenCount.toString()
+            }
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {}
+        })
+        val metaRef = com.google.firebase.database.FirebaseDatabase.getInstance()
+            .getReference("meta_resep_lokal").child(food.id.toString())
+
+        metaRef.addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                val simpan = snapshot.child("jumlahSimpan").getValue(Int::class.java)?:0
+                val share = snapshot.child("jumlahShare").getValue(Int::class.java)?:0
+                holder.txtJumlahSimpan.text = simpan.toString()
+                holder.txtJumlahShare.text = share.toString()
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+
+        })
+
 
         // Angka simpan & status bookmark dari field isFavorite Room
-        holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
-        updateBookmarkIcon(holder.imgBookmark, food.isFavorite)
+        updateBookmarkIcon(holder.imgBookmark, isSaved)
 
         // Klik card → buka Detail
         holder.itemView.setOnClickListener {
@@ -59,41 +83,22 @@ class FoodAdapter(
 
         // LISTENER 1: Komentar → update angka langsung + buka detail
         holder.layoutKomentar.setOnClickListener {
-            // angka komentar naik (dari jumlah aktual di FoodDataSource)
-            holder.txtJumlahKomen.text = FoodDataSource.getJumlahKomenAktual(food.id).toString()
             onKomentarClick(food)
         }
 
         // LISTENER 2: Simpan → toggle bookmark + update angka
         // Status simpan dihandle Room lewat callback onSimpanClick
         holder.layoutSimpan.setOnClickListener {
-            // Update angka simpan di FoodDataSource
-            if (food.isFavorite) {
-                FoodDataSource.kurangiSimpan(food.id)
-            } else {
-                FoodDataSource.tambahSimpan(food.id)
-            }
-            holder.txtJumlahSimpan.text = FoodDataSource.getJumlahSimpan(food.id).toString()
-
-            // Toggle ikon sementara (sebelum Room update)
-            updateBookmarkIcon(holder.imgBookmark, !food.isFavorite)
-
-            // Callback ke Home_Fragment untuk update Room
-            onSimpanClick(food)
-        }
-
-        // LISTENER 3: Share → tambah angka + buka share sheet
-        holder.layoutShare.setOnClickListener {
-            FoodDataSource.tambahShare(food.id)
-            holder.txtJumlahShare.text = FoodDataSource.getJumlahShare(food.id).toString()
-            onShareClick(food)
+            updateBookmarkIcon(holder.imgBookmark, !isSaved)
+            onSimpanClick(food, isSaved)
         }
     }
 
     override fun getItemCount(): Int = foodList.size
 
-    fun updateData(newList: List<Food>) {
+    fun updateData(newList: List<Food>, newSavedIds: Set<Int>) {
         foodList = newList
+        savedIds = newSavedIds
         notifyDataSetChanged()
     }
 
